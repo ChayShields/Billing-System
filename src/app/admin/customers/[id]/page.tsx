@@ -5,7 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { buttonClasses } from "@/components/ui/Button"
 import StatusBadge from "@/components/ui/StatusBadge"
 import type { Customer, Invoice } from "@/lib/types"
-import { createCustomerLogin } from "../actions"
+import { createCustomerLogin, resetCustomerPassword } from "../actions"
 
 export default async function CustomerDetailPage({
   params,
@@ -40,6 +40,11 @@ export default async function CustomerDetailPage({
   async function inviteAction() {
     "use server"
     await createCustomerLogin(customer!.id, customer!.email)
+  }
+
+  async function resetAction() {
+    "use server"
+    await resetCustomerPassword(customer!.id, customer!.email)
   }
 
   const formatGBP = (n: number) =>
@@ -114,6 +119,23 @@ export default async function CustomerDetailPage({
                 <dd className="text-ink">{customer.phone ?? "–"}</dd>
               </div>
               <div>
+                <dt className="text-xs text-ink-faint">Website</dt>
+                <dd className="text-ink">
+                  {customer.website ? (
+                    <a
+                      href={customer.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-accent hover:text-accent-hover"
+                    >
+                      {customer.website}
+                    </a>
+                  ) : (
+                    "–"
+                  )}
+                </dd>
+              </div>
+              <div>
                 <dt className="text-xs text-ink-faint">Address</dt>
                 <dd className="whitespace-pre-line text-ink">{customer.address ?? "–"}</dd>
               </div>
@@ -123,12 +145,25 @@ export default async function CustomerDetailPage({
           <div className="rounded-2xl border border-border bg-surface shadow-sm p-5">
             <h2 className="text-sm font-semibold text-ink">Portal access</h2>
             {existingProfile ? (
-              <p className="mt-2 flex items-center gap-1.5 text-sm text-status-paid-text">
-                <svg viewBox="0 0 20 20" fill="none" strokeWidth="1.8" stroke="currentColor" className="h-4 w-4">
-                  <path d="M4 10.5 8 14l8-8" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                Login already created
-              </p>
+              <div className="mt-2">
+                <p className="flex items-center gap-1.5 text-sm text-status-paid-text">
+                  <svg viewBox="0 0 20 20" fill="none" strokeWidth="1.8" stroke="currentColor" className="h-4 w-4 shrink-0">
+                    <path d="M4 10.5 8 14l8-8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  Login active
+                </p>
+                <p className="mt-2 text-xs text-ink-soft">
+                  Logs in with <span className="font-medium text-ink">{customer.email}</span>
+                </p>
+                <form action={resetAction} className="mt-3">
+                  <p className="text-xs text-ink-faint">
+                    Sends {customer.email} a fresh link to set a new password.
+                  </p>
+                  <button type="submit" className={buttonClasses("secondary", "mt-2 w-full")}>
+                    Reset password
+                  </button>
+                </form>
+              </div>
             ) : (
               <form action={inviteAction} className="mt-2">
                 <p className="text-xs text-ink-soft">

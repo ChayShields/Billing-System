@@ -6,6 +6,7 @@ export type Customer = {
   email: string
   company: string | null
   phone: string | null
+  website: string | null
   address: string | null
   created_at: string
 }

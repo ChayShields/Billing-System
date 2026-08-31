@@ -15,6 +15,7 @@ export async function createCustomer(formData: FormData) {
       email: String(formData.get("email") ?? ""),
       company: String(formData.get("company") ?? "") || null,
       phone: String(formData.get("phone") ?? "") || null,
+      website: String(formData.get("website") ?? "") || null,
       address: String(formData.get("address") ?? "") || null,
     })
     .select("id")
@@ -46,8 +47,30 @@ export async function createCustomerLogin(customerId: string, email: string) {
   })
   if (profileError) throw new Error(profileError.message)
 
+  // The account and profile above are the part that matters - they're
+  // already committed. Don't let a failed confirmation email (rate
+  // limit, an unreachable domain, a Supabase SMTP hiccup) throw an
+  // unhandled error and leave Chay looking at a crash with no idea
+  // whether the login actually got created. Log it and let the page's
+  // "Reset password" button (below) be the retry path instead.
   const { error: resetError } = await admin.auth.resetPasswordForEmail(email)
-  if (resetError) throw new Error(resetError.message)
+  if (resetError) {
+    console.error(`Login created for ${email}, but the setup email failed to send:`, resetError.message)
+  }
+
+  revalidatePath(`/admin/customers/${customerId}`)
+}
+
+// Sends a fresh "set your password" link to an existing customer login -
+// used when Chay needs to reset a customer's password (forgotten,
+// suspected compromised, etc.), not just at first creation.
+export async function resetCustomerPassword(customerId: string, email: string) {
+  const admin = createAdminClient()
+
+  const { error } = await admin.auth.resetPasswordForEmail(email)
+  if (error) {
+    console.error(`Password reset email to ${email} failed to send:`, error.message)
+  }
 
   revalidatePath(`/admin/customers/${customerId}`)
 }

@@ -79,6 +79,12 @@ export default async function CustomersPage() {
                 placeholder="Phone (optional)"
                 className="rounded-lg border border-border px-3 py-2 text-sm text-ink shadow-xs placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
+              <input
+                name="website"
+                type="url"
+                placeholder="Website (optional)"
+                className="rounded-lg border border-border px-3 py-2 text-sm text-ink shadow-xs placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+              />
               <textarea
                 name="address"
                 placeholder="Address (optional)"
