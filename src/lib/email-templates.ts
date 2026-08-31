@@ -158,7 +158,7 @@ export function invoiceEmail(
                   or <a href="mailto:${BUSINESS.contactEmail}" style="color:#4338ca; text-decoration:none;">${BUSINESS.contactEmail}</a>.
                 </p>
                 <p style="margin:16px 0 0; font-size:15px; line-height:1.6; color:#0f172a;">
-                  Chay
+                  Chay Shields, Digital Specialist
                 </p>
               </td>
             </tr>
