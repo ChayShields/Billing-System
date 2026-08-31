@@ -19,10 +19,10 @@ export default async function NewInvoicePage({
   if (!customers || customers.length === 0) {
     return (
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">New Invoice</h1>
-        <p className="mt-4 text-sm text-slate-500">
+        <h1 className="text-2xl font-semibold tracking-tight text-ink">New Invoice</h1>
+        <p className="mt-4 text-sm text-ink-soft">
           You need at least one customer before creating an invoice.{" "}
-          <Link href="/admin/customers" className="font-medium text-slate-900 underline">
+          <Link href="/admin/customers" className="font-medium text-accent underline">
             Add a customer
           </Link>
           .
@@ -33,10 +33,10 @@ export default async function NewInvoicePage({
 
   return (
     <div>
-      <Link href="/admin/invoices" className="text-sm text-slate-500 hover:text-slate-900">
+      <Link href="/admin/invoices" className="text-sm text-ink-soft hover:text-ink">
         &larr; Invoices
       </Link>
-      <h1 className="mt-3 text-2xl font-semibold text-slate-900">New Invoice</h1>
+      <h1 className="mt-3 text-2xl font-semibold tracking-tight text-ink">New Invoice</h1>
       <NewInvoiceForm customers={customers} defaultCustomerId={customer} />
     </div>
   )

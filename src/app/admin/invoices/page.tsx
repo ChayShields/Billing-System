@@ -1,13 +1,16 @@
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
+import { buttonClasses } from "@/components/ui/Button"
+import StatusBadge from "@/components/ui/StatusBadge"
 import type { Customer, Invoice, InvoiceStatus } from "@/lib/types"
 
-const STATUS_STYLES: Record<string, string> = {
-  draft: "bg-slate-100 text-slate-600",
-  sent: "bg-blue-100 text-blue-700",
-  paid: "bg-green-100 text-green-700",
-  overdue: "bg-red-100 text-red-700",
-}
+const FILTERS: { label: string; value?: InvoiceStatus }[] = [
+  { label: "All" },
+  { label: "Draft", value: "draft" },
+  { label: "Sent", value: "sent" },
+  { label: "Paid", value: "paid" },
+  { label: "Overdue", value: "overdue" },
+]
 
 export default async function InvoicesPage({
   searchParams,
@@ -29,72 +32,63 @@ export default async function InvoicesPage({
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-slate-900">Invoices</h1>
-        <Link
-          href="/admin/invoices/new"
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
-        >
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">Invoices</h1>
+          <p className="mt-1 text-sm text-ink-soft">Every invoice you've raised.</p>
+        </div>
+        <Link href="/admin/invoices/new" className={buttonClasses("primary")}>
           New Invoice
         </Link>
       </div>
 
-      <div className="mt-4 flex gap-2 text-sm">
-        {["all", "draft", "sent", "paid", "overdue"].map((s) => (
+      <div className="mt-5 flex gap-1.5">
+        {FILTERS.map((f) => (
           <Link
-            key={s}
-            href={s === "all" ? "/admin/invoices" : `/admin/invoices?status=${s}`}
-            className={`rounded-full px-3 py-1 ${
-              (status ?? "all") === s
-                ? "bg-slate-900 text-white"
-                : "bg-white text-slate-600 hover:bg-slate-100"
+            key={f.label}
+            href={f.value ? `/admin/invoices?status=${f.value}` : "/admin/invoices"}
+            className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+              (status ?? undefined) === f.value
+                ? "bg-ink text-white"
+                : "bg-surface text-ink-soft hover:bg-surface-sunken"
             }`}
           >
-            {s[0].toUpperCase() + s.slice(1)}
+            {f.label}
           </Link>
         ))}
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-lg border border-slate-200 bg-white">
+      <div className="mt-4 overflow-hidden rounded-xl border border-border bg-surface">
         <table className="w-full text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+          <thead className="border-b border-border bg-surface-muted text-left text-xs font-medium uppercase tracking-wide text-ink-faint">
             <tr>
-              <th className="px-4 py-3">Number</th>
-              <th className="px-4 py-3">Customer</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Total</th>
-              <th className="px-4 py-3">Due</th>
+              <th className="px-5 py-3">Number</th>
+              <th className="px-5 py-3">Customer</th>
+              <th className="px-5 py-3">Status</th>
+              <th className="px-5 py-3">Total</th>
+              <th className="px-5 py-3">Due</th>
             </tr>
           </thead>
           <tbody>
             {(invoices ?? []).map((inv) => (
-              <tr key={inv.id} className="border-b border-slate-100 last:border-0">
-                <td className="px-4 py-3">
-                  <Link
-                    href={`/admin/invoices/${inv.id}`}
-                    className="font-medium text-slate-900 hover:underline"
-                  >
+              <tr key={inv.id} className="border-b border-border last:border-0 hover:bg-surface-muted">
+                <td className="px-5 py-3.5">
+                  <Link href={`/admin/invoices/${inv.id}`} className="font-medium text-ink hover:text-accent">
                     {inv.invoice_number}
                   </Link>
                 </td>
-                <td className="px-4 py-3 text-slate-600">{inv.customers?.name}</td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[inv.status]}`}
-                  >
-                    {inv.status}
-                  </span>
+                <td className="px-5 py-3.5 text-ink-soft">{inv.customers?.name}</td>
+                <td className="px-5 py-3.5">
+                  <StatusBadge status={inv.status} />
                 </td>
-                <td className="px-4 py-3 text-slate-600">
-                  {new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(
-                    inv.total
-                  )}
+                <td className="px-5 py-3.5 text-ink-soft">
+                  {new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(inv.total)}
                 </td>
-                <td className="px-4 py-3 text-slate-600">{inv.due_date ?? "-"}</td>
+                <td className="px-5 py-3.5 text-ink-soft">{inv.due_date ?? "–"}</td>
               </tr>
             ))}
             {(invoices ?? []).length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-slate-400">
+                <td colSpan={5} className="px-5 py-10 text-center text-ink-faint">
                   No invoices found.
                 </td>
               </tr>

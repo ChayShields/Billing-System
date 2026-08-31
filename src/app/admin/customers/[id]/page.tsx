@@ -2,15 +2,10 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { buttonClasses } from "@/components/ui/Button"
+import StatusBadge from "@/components/ui/StatusBadge"
 import type { Customer, Invoice } from "@/lib/types"
 import { createCustomerLogin } from "../actions"
-
-const STATUS_STYLES: Record<string, string> = {
-  draft: "bg-slate-100 text-slate-600",
-  sent: "bg-blue-100 text-blue-700",
-  paid: "bg-green-100 text-green-700",
-  overdue: "bg-red-100 text-red-700",
-}
 
 export default async function CustomerDetailPage({
   params,
@@ -47,68 +42,56 @@ export default async function CustomerDetailPage({
     await createCustomerLogin(customer!.id, customer!.email)
   }
 
+  const formatGBP = (n: number) =>
+    new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n)
+
   return (
     <div>
-      <Link href="/admin/customers" className="text-sm text-slate-500 hover:text-slate-900">
+      <Link href="/admin/customers" className="text-sm text-ink-soft hover:text-ink">
         &larr; Customers
       </Link>
 
       <div className="mt-3 flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">{customer.name}</h1>
-          <p className="text-sm text-slate-500">{customer.company}</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">{customer.name}</h1>
+          {customer.company && <p className="text-sm text-ink-soft">{customer.company}</p>}
         </div>
-        <Link
-          href={`/admin/invoices/new?customer=${customer.id}`}
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
-        >
+        <Link href={`/admin/invoices/new?customer=${customer.id}`} className={buttonClasses("primary")}>
           New Invoice
         </Link>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-3">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <h2 className="text-sm font-semibold text-slate-900">Invoices</h2>
-          <div className="mt-3 overflow-hidden rounded-lg border border-slate-200 bg-white">
+          <h2 className="text-sm font-semibold text-ink">Invoices</h2>
+          <div className="mt-3 overflow-hidden rounded-xl border border-border bg-surface">
             <table className="w-full text-sm">
-              <thead className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+              <thead className="border-b border-border bg-surface-muted text-left text-xs font-medium uppercase tracking-wide text-ink-faint">
                 <tr>
-                  <th className="px-4 py-3">Number</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Total</th>
-                  <th className="px-4 py-3">Due</th>
+                  <th className="px-5 py-3">Number</th>
+                  <th className="px-5 py-3">Status</th>
+                  <th className="px-5 py-3">Total</th>
+                  <th className="px-5 py-3">Due</th>
                 </tr>
               </thead>
               <tbody>
                 {(invoices ?? []).map((inv) => (
-                  <tr key={inv.id} className="border-b border-slate-100 last:border-0">
-                    <td className="px-4 py-3">
-                      <Link
-                        href={`/admin/invoices/${inv.id}`}
-                        className="font-medium text-slate-900 hover:underline"
-                      >
+                  <tr key={inv.id} className="border-b border-border last:border-0 hover:bg-surface-muted">
+                    <td className="px-5 py-3.5">
+                      <Link href={`/admin/invoices/${inv.id}`} className="font-medium text-ink hover:text-accent">
                         {inv.invoice_number}
                       </Link>
                     </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[inv.status]}`}
-                      >
-                        {inv.status}
-                      </span>
+                    <td className="px-5 py-3.5">
+                      <StatusBadge status={inv.status} />
                     </td>
-                    <td className="px-4 py-3 text-slate-600">
-                      {new Intl.NumberFormat("en-GB", {
-                        style: "currency",
-                        currency: "GBP",
-                      }).format(inv.total)}
-                    </td>
-                    <td className="px-4 py-3 text-slate-600">{inv.due_date ?? "-"}</td>
+                    <td className="px-5 py-3.5 text-ink-soft">{formatGBP(inv.total)}</td>
+                    <td className="px-5 py-3.5 text-ink-soft">{inv.due_date ?? "–"}</td>
                   </tr>
                 ))}
                 {(invoices ?? []).length === 0 && (
                   <tr>
-                    <td colSpan={4} className="px-4 py-6 text-center text-slate-400">
+                    <td colSpan={4} className="px-5 py-10 text-center text-ink-faint">
                       No invoices yet.
                     </td>
                   </tr>
@@ -118,42 +101,44 @@ export default async function CustomerDetailPage({
           </div>
         </div>
 
-        <div>
-          <div className="rounded-lg border border-slate-200 bg-white p-5">
-            <h2 className="text-sm font-semibold text-slate-900">Contact</h2>
-            <dl className="mt-3 space-y-2 text-sm">
+        <div className="flex flex-col gap-4">
+          <div className="rounded-xl border border-border bg-surface p-5">
+            <h2 className="text-sm font-semibold text-ink">Contact</h2>
+            <dl className="mt-3 space-y-3 text-sm">
               <div>
-                <dt className="text-slate-400">Email</dt>
-                <dd className="text-slate-700">{customer.email}</dd>
+                <dt className="text-xs text-ink-faint">Email</dt>
+                <dd className="text-ink">{customer.email}</dd>
               </div>
               <div>
-                <dt className="text-slate-400">Phone</dt>
-                <dd className="text-slate-700">{customer.phone ?? "-"}</dd>
+                <dt className="text-xs text-ink-faint">Phone</dt>
+                <dd className="text-ink">{customer.phone ?? "–"}</dd>
               </div>
               <div>
-                <dt className="text-slate-400">Address</dt>
-                <dd className="whitespace-pre-line text-slate-700">{customer.address ?? "-"}</dd>
+                <dt className="text-xs text-ink-faint">Address</dt>
+                <dd className="whitespace-pre-line text-ink">{customer.address ?? "–"}</dd>
               </div>
             </dl>
+          </div>
 
-            <div className="mt-5 border-t border-slate-100 pt-4">
-              <h2 className="text-sm font-semibold text-slate-900">Portal access</h2>
-              {existingProfile ? (
-                <p className="mt-2 text-sm text-green-700">Login already created.</p>
-              ) : (
-                <form action={inviteAction} className="mt-2">
-                  <p className="text-xs text-slate-500">
-                    Creates a login and emails {customer.email} a link to set their password.
-                  </p>
-                  <button
-                    type="submit"
-                    className="mt-2 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                  >
-                    Create portal login
-                  </button>
-                </form>
-              )}
-            </div>
+          <div className="rounded-xl border border-border bg-surface p-5">
+            <h2 className="text-sm font-semibold text-ink">Portal access</h2>
+            {existingProfile ? (
+              <p className="mt-2 flex items-center gap-1.5 text-sm text-status-paid-text">
+                <svg viewBox="0 0 20 20" fill="none" strokeWidth="1.8" stroke="currentColor" className="h-4 w-4">
+                  <path d="M4 10.5 8 14l8-8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Login already created
+              </p>
+            ) : (
+              <form action={inviteAction} className="mt-2">
+                <p className="text-xs text-ink-soft">
+                  Creates a login and emails {customer.email} a link to set their password.
+                </p>
+                <button type="submit" className={buttonClasses("secondary", "mt-3 w-full")}>
+                  Create portal login
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </div>

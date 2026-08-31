@@ -1,14 +1,8 @@
 import Link from "next/link"
 import { requireCustomer } from "@/lib/auth"
 import { createClient } from "@/lib/supabase/server"
+import StatusBadge from "@/components/ui/StatusBadge"
 import type { Invoice } from "@/lib/types"
-
-const STATUS_STYLES: Record<string, string> = {
-  draft: "bg-slate-100 text-slate-600",
-  sent: "bg-blue-100 text-blue-700",
-  paid: "bg-green-100 text-green-700",
-  overdue: "bg-red-100 text-red-700",
-}
 
 export default async function PortalPage() {
   const profile = await requireCustomer()
@@ -23,35 +17,30 @@ export default async function PortalPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900">Your Invoices</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-ink">Your Invoices</h1>
+      <p className="mt-1 text-sm text-ink-soft">Everything you've been billed, and what's outstanding.</p>
 
-      <div className="mt-4 flex flex-col gap-3">
+      <div className="mt-5 flex flex-col gap-3">
         {(invoices ?? []).map((inv) => (
           <Link
             key={inv.id}
             href={`/portal/invoices/${inv.id}`}
-            className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4 hover:border-slate-300"
+            className="flex items-center justify-between rounded-xl border border-border bg-surface p-4 transition-colors hover:border-accent/40"
           >
             <div>
-              <p className="font-medium text-slate-900">{inv.invoice_number}</p>
-              <p className="text-xs text-slate-500">Due {inv.due_date ?? "-"}</p>
+              <p className="font-medium text-ink">{inv.invoice_number}</p>
+              <p className="text-xs text-ink-faint">Due {inv.due_date ?? "–"}</p>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-sm text-slate-700">
-                {new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(
-                  inv.total
-                )}
+              <span className="text-sm font-medium tabular-nums text-ink">
+                {new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(inv.total)}
               </span>
-              <span
-                className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[inv.status]}`}
-              >
-                {inv.status}
-              </span>
+              <StatusBadge status={inv.status} />
             </div>
           </Link>
         ))}
         {(invoices ?? []).length === 0 && (
-          <p className="rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm text-slate-400">
+          <p className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-ink-faint">
             No invoices yet.
           </p>
         )}

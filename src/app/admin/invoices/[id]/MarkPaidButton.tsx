@@ -2,6 +2,7 @@
 
 import { useTransition } from "react"
 import { markInvoicePaid } from "../actions"
+import { buttonClasses } from "@/components/ui/Button"
 
 export default function MarkPaidButton({ invoiceId }: { invoiceId: string }) {
   const [isPending, startTransition] = useTransition()
@@ -15,7 +16,7 @@ export default function MarkPaidButton({ invoiceId }: { invoiceId: string }) {
           return
         startTransition(() => markInvoicePaid(invoiceId))
       }}
-      className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+      className={buttonClasses("success")}
     >
       {isPending ? "Marking as paid..." : "Mark as Paid"}
     </button>
