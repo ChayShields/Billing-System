@@ -20,8 +20,8 @@ const SECTIONS = [
     body: "For each customer: name, email address, and optionally company name, phone number, website, and address, entered by Chay when a customer is added. For each invoice: line-item descriptions, quantities, prices, dates, and status. If a customer is given portal access, their email address is used as their login and their account is linked to their own customer record.",
   },
   {
-    heading: "How we use it",
-    body: "This information is used solely to issue and track invoices, and to let a customer view their own invoice history and payment status. It is not used for marketing, not sold, and not shared with third parties except the service providers below.",
+    heading: "How we use it, and why we're allowed to",
+    body: "This information is used solely to issue and track invoices, and to let a customer view their own invoice history and payment status. It is not used for marketing, not sold, and not shared with third parties except the service providers below. The legal basis for this processing is contract (it's necessary to deliver and be paid for the work agreed with each customer) and, for basic business record-keeping such as retaining invoices for accounting purposes, legal obligation.",
   },
   {
     heading: "No online payment processing",
@@ -33,7 +33,11 @@ const SECTIONS = [
   },
   {
     heading: "Service providers",
-    body: "Data is stored with Supabase (database, authentication). Payment-confirmation emails, once configured, are sent via Resend. Both process data on our behalf under their own security and data-protection commitments; neither is used for any purpose beyond running this system.",
+    body: "Data is stored with Supabase (database, authentication), and payment-confirmation emails are sent via Resend. Both process data on our behalf under their own security and data-protection commitments, and neither is used for any purpose beyond running this system - no marketing or analytics use.",
+  },
+  {
+    heading: "International transfers",
+    body: "This system's database and email delivery are both configured to process data within the UK/EU. Supabase and Resend may still rely on underlying infrastructure or sub-processors located outside the UK/EEA as part of running their services; where that happens, it's covered by their own standard contractual safeguards.",
   },
   {
     heading: "Cookies",
@@ -45,7 +49,7 @@ const SECTIONS = [
   },
   {
     heading: "Your rights",
-    body: "If you're a customer with an account on this system, you can ask Chay (Chay@Hireme.link) for a copy of the information held about you, ask for corrections, or ask for it to be deleted where it's no longer needed for an active or past engagement.",
+    body: "If you're a customer with an account on this system, under UK GDPR you can ask Chay (Chay@Hireme.link) to: give you a copy of the information held about you, correct anything inaccurate, delete it where it's no longer needed for an active or past engagement or legal obligation, restrict or object to how it's processed, or provide it to you in a portable format. You also have the right to complain to the UK Information Commissioner's Office (ico.org.uk) if you think your data hasn't been handled properly.",
   },
 ]
 
