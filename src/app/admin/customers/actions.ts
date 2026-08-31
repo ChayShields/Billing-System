@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { SITE_URL } from "@/lib/business-details"
 
 export async function createCustomer(formData: FormData) {
   const supabase = await createClient()
@@ -53,7 +54,9 @@ export async function createCustomerLogin(customerId: string, email: string) {
   // unhandled error and leave Chay looking at a crash with no idea
   // whether the login actually got created. Log it and let the page's
   // "Reset password" button (below) be the retry path instead.
-  const { error: resetError } = await admin.auth.resetPasswordForEmail(email)
+  const { error: resetError } = await admin.auth.resetPasswordForEmail(email, {
+    redirectTo: `${SITE_URL}/reset-password`,
+  })
   if (resetError) {
     console.error(`Login created for ${email}, but the setup email failed to send:`, resetError.message)
   }
@@ -67,7 +70,9 @@ export async function createCustomerLogin(customerId: string, email: string) {
 export async function resetCustomerPassword(customerId: string, email: string) {
   const admin = createAdminClient()
 
-  const { error } = await admin.auth.resetPasswordForEmail(email)
+  const { error } = await admin.auth.resetPasswordForEmail(email, {
+    redirectTo: `${SITE_URL}/reset-password`,
+  })
   if (error) {
     console.error(`Password reset email to ${email} failed to send:`, error.message)
   }

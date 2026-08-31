@@ -1,3 +1,8 @@
+// Single production domain for this app. Passed explicitly as `redirectTo`
+// on every password-reset call rather than relying on Supabase's dashboard
+// "Site URL" fallback, which proved unreliable in practice.
+export const SITE_URL = "https://billing.hireme.link"
+
 // Chay's own contact/payment details, used across invoice emails. Not a
 // secret - this is exactly the information a customer needs to pay by
 // bank transfer, the same as what would appear on a printed invoice.
