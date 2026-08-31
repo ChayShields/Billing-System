@@ -46,7 +46,17 @@ export default async function InvoiceDetailPage({
             {invoice.customers.company ? ` (${invoice.customers.company})` : ""}
           </Link>
         </div>
-        <StatusBadge status={invoice.status} />
+        <div className="flex items-center gap-3">
+          {invoice.status === "paid" && (
+            <a
+              href={`/api/invoices/${invoice.id}/pdf`}
+              className="text-sm font-medium text-accent hover:text-accent-hover"
+            >
+              Download PDF
+            </a>
+          )}
+          <StatusBadge status={invoice.status} />
+        </div>
       </div>
 
       <div className="mt-6 overflow-hidden rounded-3xl border border-border bg-surface shadow-sm">

@@ -61,9 +61,14 @@ export default async function CustomerDetailPage({
           <h1 className="text-2xl font-semibold tracking-tight text-ink">{customer.name}</h1>
           {customer.company && <p className="text-sm text-ink-soft">{customer.company}</p>}
         </div>
-        <Link href={`/admin/invoices/new?customer=${customer.id}`} className={buttonClasses("primary")}>
-          New Invoice
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href={`/admin/customers/${customer.id}/edit`} className={buttonClasses("secondary")}>
+            Edit
+          </Link>
+          <Link href={`/admin/invoices/new?customer=${customer.id}`} className={buttonClasses("primary")}>
+            New Invoice
+          </Link>
+        </div>
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">

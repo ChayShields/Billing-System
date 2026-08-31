@@ -28,6 +28,28 @@ export async function createCustomer(formData: FormData) {
   redirect(`/admin/customers/${data.id}`)
 }
 
+export async function updateCustomer(customerId: string, formData: FormData) {
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from("customers")
+    .update({
+      name: String(formData.get("name") ?? ""),
+      email: String(formData.get("email") ?? ""),
+      company: String(formData.get("company") ?? "") || null,
+      phone: String(formData.get("phone") ?? "") || null,
+      website: String(formData.get("website") ?? "") || null,
+      address: String(formData.get("address") ?? "") || null,
+    })
+    .eq("id", customerId)
+
+  if (error) throw new Error(error.message)
+
+  revalidatePath("/admin/customers")
+  revalidatePath(`/admin/customers/${customerId}`)
+  redirect(`/admin/customers/${customerId}`)
+}
+
 // Creates a login for a customer so they can view their own invoices in
 // /portal. Uses the admin client (secret key) - only ever called from
 // this server action, never exposed to the browser.

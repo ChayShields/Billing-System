@@ -34,7 +34,17 @@ export default async function PortalInvoiceDetailPage({
 
       <div className="mt-3 flex items-start justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-ink">{invoice.invoice_number}</h1>
-        <StatusBadge status={invoice.status} />
+        <div className="flex items-center gap-3">
+          {invoice.status === "paid" && (
+            <a
+              href={`/api/invoices/${invoice.id}/pdf`}
+              className="text-sm font-medium text-accent hover:text-accent-hover"
+            >
+              Download PDF
+            </a>
+          )}
+          <StatusBadge status={invoice.status} />
+        </div>
       </div>
 
       <div className="mt-6 overflow-hidden rounded-3xl border border-border bg-surface shadow-sm">
