@@ -40,8 +40,8 @@ export default async function AdminDashboard() {
         </Link>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-3">
-        <div className="rise-in relative overflow-hidden rounded-2xl bg-gradient-to-br from-accent to-[#2f2596] p-6 text-white shadow-lg lg:col-span-2">
+      <div className="mt-6 grid grid-cols-2 gap-5 lg:grid-cols-4">
+        <div className="rise-in relative col-span-2 row-span-2 overflow-hidden rounded-3xl bg-gradient-to-br from-accent to-[#2f2596] p-7 text-white shadow-lg">
           <div
             aria-hidden
             className="pointer-events-none absolute -right-10 -top-16 h-56 w-56 rounded-full bg-white/10 blur-2xl"
@@ -53,13 +53,13 @@ export default async function AdminDashboard() {
           <p className="relative text-xs font-medium uppercase tracking-wide text-white/70">
             Outstanding balance
           </p>
-          <p className="relative mt-2 text-4xl font-semibold tabular-nums">{formatGBP(totals.outstanding)}</p>
-          <p className="relative mt-3 text-sm text-white/70">
+          <p className="relative mt-3 text-5xl font-semibold tabular-nums">{formatGBP(totals.outstanding)}</p>
+          <p className="relative mt-3 max-w-xs text-sm text-white/70">
             Across sent and draft invoices awaiting payment.
           </p>
           <Link
             href="/admin/invoices"
-            className="relative mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-white hover:text-white/80"
+            className="relative mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-white hover:text-white/80"
           >
             View all invoices
             <svg viewBox="0 0 20 20" fill="none" strokeWidth="1.8" stroke="currentColor" className="h-3.5 w-3.5">
@@ -68,70 +68,92 @@ export default async function AdminDashboard() {
           </Link>
         </div>
 
-        <div className="rise-in flex flex-col divide-y divide-border rounded-2xl border border-border bg-surface shadow-sm" style={{ animationDelay: "80ms" }}>
-          <Link
-            href="/admin/customers"
-            className="flex items-center justify-between px-5 py-4 transition-colors hover:bg-surface-muted"
+        <Link
+          href="/admin/customers"
+          className="rise-in col-span-2 flex items-center justify-between rounded-3xl border border-border bg-surface p-5 shadow-sm transition-all duration-150 ease-out hover:-translate-y-0.5 hover:shadow-md sm:col-span-1"
+          style={{ animationDelay: "80ms" }}
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-surface-sunken text-ink-soft">
+            <svg viewBox="0 0 20 20" fill="none" strokeWidth="1.6" stroke="currentColor" className="h-5 w-5">
+              <circle cx="10" cy="7" r="3" />
+              <path d="M4 17c0-3 2.7-5 6-5s6 2 6 5" strokeLinecap="round" />
+            </svg>
+          </div>
+          <div className="text-right">
+            <p className="text-2xl font-semibold tabular-nums text-ink">{customerCount ?? 0}</p>
+            <p className="text-xs text-ink-faint">Customers</p>
+          </div>
+        </Link>
+
+        <Link
+          href="/admin/invoices?status=overdue"
+          className="rise-in col-span-2 flex items-center justify-between rounded-3xl border border-border bg-surface p-5 shadow-sm transition-all duration-150 ease-out hover:-translate-y-0.5 hover:shadow-md sm:col-span-1"
+          style={{ animationDelay: "120ms" }}
+        >
+          <div
+            className={`flex h-10 w-10 items-center justify-center rounded-2xl ${totals.overdue > 0 ? "bg-status-overdue-bg text-status-overdue-text" : "bg-surface-sunken text-ink-soft"}`}
           >
-            <span className="text-sm text-ink-soft">Customers</span>
-            <span className="text-lg font-semibold tabular-nums text-ink">{customerCount ?? 0}</span>
-          </Link>
-          <Link
-            href="/admin/invoices?status=overdue"
-            className="flex items-center justify-between px-5 py-4 transition-colors hover:bg-surface-muted"
-          >
-            <span className="text-sm text-ink-soft">Overdue</span>
-            <span
-              className={`text-lg font-semibold tabular-nums ${totals.overdue > 0 ? "text-status-overdue-text" : "text-ink"}`}
+            <svg viewBox="0 0 20 20" fill="none" strokeWidth="1.6" stroke="currentColor" className="h-5 w-5">
+              <path d="M10 6v5l3 2" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="10" cy="10" r="7" />
+            </svg>
+          </div>
+          <div className="text-right">
+            <p
+              className={`text-2xl font-semibold tabular-nums ${totals.overdue > 0 ? "text-status-overdue-text" : "text-ink"}`}
             >
               {formatGBP(totals.overdue)}
-            </span>
-          </Link>
-          <Link
-            href="/admin/invoices?status=paid"
-            className="flex items-center justify-between px-5 py-4 transition-colors hover:bg-surface-muted"
-          >
-            <span className="text-sm text-ink-soft">Paid (all time)</span>
-            <span className="text-lg font-semibold tabular-nums text-status-paid-text">
-              {formatGBP(totals.paid)}
-            </span>
-          </Link>
-        </div>
+            </p>
+            <p className="text-xs text-ink-faint">Overdue</p>
+          </div>
+        </Link>
+
+        <Link
+          href="/admin/invoices?status=paid"
+          className="rise-in col-span-2 flex items-center justify-between rounded-3xl border border-border bg-surface p-5 shadow-sm transition-all duration-150 ease-out hover:-translate-y-0.5 hover:shadow-md lg:col-span-2"
+          style={{ animationDelay: "160ms" }}
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-status-paid-bg text-status-paid-text">
+            <svg viewBox="0 0 20 20" fill="none" strokeWidth="1.6" stroke="currentColor" className="h-5 w-5">
+              <path d="M4 10.5 8 14l8-8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <div className="text-right">
+            <p className="text-2xl font-semibold tabular-nums text-status-paid-text">{formatGBP(totals.paid)}</p>
+            <p className="text-xs text-ink-faint">Paid (all time)</p>
+          </div>
+        </Link>
       </div>
 
-      <div className="rise-in mt-6" style={{ animationDelay: "140ms" }}>
+      <div className="rise-in mt-6" style={{ animationDelay: "200ms" }}>
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-ink">Recent invoices</h2>
           <Link href="/admin/invoices" className="text-sm font-medium text-accent hover:text-accent-hover">
             View all
           </Link>
         </div>
-        <div className="mt-3 overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+        <div className="mt-3 flex flex-col gap-3">
           {recent.length === 0 ? (
-            <p className="px-5 py-10 text-center text-sm text-ink-faint">
+            <p className="rounded-3xl border border-dashed border-border p-10 text-center text-sm text-ink-faint">
               No invoices yet - create your first one.
             </p>
           ) : (
-            <table className="w-full text-sm">
-              <tbody>
-                {recent.map((inv) => (
-                  <tr key={inv.id} className="border-b border-border last:border-0 hover:bg-surface-muted">
-                    <td className="px-5 py-3.5">
-                      <Link href={`/admin/invoices/${inv.id}`} className="font-medium text-ink hover:text-accent">
-                        {inv.invoice_number}
-                      </Link>
-                    </td>
-                    <td className="px-5 py-3.5 text-ink-soft">{inv.customers?.name}</td>
-                    <td className="px-5 py-3.5">
-                      <StatusBadge status={inv.status} />
-                    </td>
-                    <td className="px-5 py-3.5 text-right font-medium tabular-nums text-ink">
-                      {formatGBP(inv.total)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            recent.map((inv) => (
+              <Link
+                key={inv.id}
+                href={`/admin/invoices/${inv.id}`}
+                className="group flex items-center justify-between rounded-3xl border border-border bg-surface p-4 shadow-sm transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-accent/30 hover:shadow-md"
+              >
+                <div>
+                  <p className="font-medium text-ink group-hover:text-accent">{inv.invoice_number}</p>
+                  <p className="text-xs text-ink-faint">{inv.customers?.name}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium tabular-nums text-ink">{formatGBP(inv.total)}</span>
+                  <StatusBadge status={inv.status} />
+                </div>
+              </Link>
+            ))
           )}
         </div>
       </div>

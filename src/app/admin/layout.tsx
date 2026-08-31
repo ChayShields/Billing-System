@@ -43,7 +43,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="flex min-h-screen bg-surface-sunken">
       <aside className="relative z-10 flex w-64 shrink-0 flex-col bg-surface shadow-lg">
         <div className="flex h-16 items-center gap-2.5 px-6">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-b from-accent to-accent-hover text-white shadow-accent">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-b from-accent to-accent-hover text-white shadow-accent">
             <svg viewBox="0 0 20 20" fill="none" strokeWidth="1.7" stroke="currentColor" className="h-4 w-4">
               <rect x="4" y="3" width="12" height="14" rx="1.5" />
               <path d="M7 7h6M7 10h6M7 13h3" strokeLinecap="round" />
@@ -64,7 +64,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <form action={logout}>
             <button
               type="submit"
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink"
+              className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink"
             >
               <svg viewBox="0 0 20 20" fill="none" strokeWidth="1.6" stroke="currentColor" className="h-4 w-4">
                 <path d="M7 4H4v12h3M13 14l4-4-4-4M17 10H8" strokeLinecap="round" strokeLinejoin="round" />

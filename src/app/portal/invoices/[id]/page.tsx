@@ -37,7 +37,7 @@ export default async function PortalInvoiceDetailPage({
         <StatusBadge status={invoice.status} />
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+      <div className="mt-6 overflow-hidden rounded-3xl border border-border bg-surface shadow-sm">
         <table className="w-full text-sm">
           <thead className="border-b border-border bg-surface-muted text-left text-xs font-medium uppercase tracking-wide text-ink-faint">
             <tr>
@@ -71,7 +71,7 @@ export default async function PortalInvoiceDetailPage({
       </div>
 
       {invoice.notes && (
-        <div className="mt-4 rounded-2xl border border-border bg-surface shadow-sm p-4">
+        <div className="mt-4 rounded-3xl border border-border bg-surface shadow-sm p-4">
           <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">Notes</p>
           <p className="mt-1 whitespace-pre-line text-sm text-ink-soft">{invoice.notes}</p>
         </div>

@@ -69,45 +69,33 @@ export default async function CustomerDetailPage({
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <h2 className="text-sm font-semibold text-ink">Invoices</h2>
-          <div className="mt-3 overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
-            <table className="w-full text-sm">
-              <thead className="border-b border-border bg-surface-muted text-left text-xs font-medium uppercase tracking-wide text-ink-faint">
-                <tr>
-                  <th className="px-5 py-3">Number</th>
-                  <th className="px-5 py-3">Status</th>
-                  <th className="px-5 py-3">Total</th>
-                  <th className="px-5 py-3">Due</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(invoices ?? []).map((inv) => (
-                  <tr key={inv.id} className="border-b border-border last:border-0 hover:bg-surface-muted">
-                    <td className="px-5 py-3.5">
-                      <Link href={`/admin/invoices/${inv.id}`} className="font-medium text-ink hover:text-accent">
-                        {inv.invoice_number}
-                      </Link>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <StatusBadge status={inv.status} />
-                    </td>
-                    <td className="px-5 py-3.5 text-ink-soft">{formatGBP(inv.total)}</td>
-                    <td className="px-5 py-3.5 text-ink-soft">{inv.due_date ?? "–"}</td>
-                  </tr>
-                ))}
-                {(invoices ?? []).length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="px-5 py-10 text-center text-ink-faint">
-                      No invoices yet.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+          <div className="mt-3 flex flex-col gap-3">
+            {(invoices ?? []).map((inv) => (
+              <Link
+                key={inv.id}
+                href={`/admin/invoices/${inv.id}`}
+                className="group flex items-center justify-between rounded-3xl border border-border bg-surface p-4 shadow-sm transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-accent/30 hover:shadow-md"
+              >
+                <div>
+                  <p className="font-medium text-ink group-hover:text-accent">{inv.invoice_number}</p>
+                  <p className="text-xs text-ink-faint">Due {inv.due_date ?? "–"}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium tabular-nums text-ink">{formatGBP(inv.total)}</span>
+                  <StatusBadge status={inv.status} />
+                </div>
+              </Link>
+            ))}
+            {(invoices ?? []).length === 0 && (
+              <p className="rounded-3xl border border-dashed border-border p-8 text-center text-ink-faint">
+                No invoices yet.
+              </p>
+            )}
           </div>
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="rounded-2xl border border-border bg-surface shadow-sm p-5">
+          <div className="rounded-3xl border border-border bg-surface shadow-sm p-5">
             <h2 className="text-sm font-semibold text-ink">Contact</h2>
             <dl className="mt-3 space-y-3 text-sm">
               <div>
@@ -142,7 +130,7 @@ export default async function CustomerDetailPage({
             </dl>
           </div>
 
-          <div className="rounded-2xl border border-border bg-surface shadow-sm p-5">
+          <div className="rounded-3xl border border-border bg-surface shadow-sm p-5">
             <h2 className="text-sm font-semibold text-ink">Portal access</h2>
             {existingProfile ? (
               <div className="mt-2">

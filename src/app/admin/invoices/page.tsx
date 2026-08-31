@@ -57,44 +57,39 @@ export default async function InvoicesPage({
         ))}
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
-        <table className="w-full text-sm">
-          <thead className="border-b border-border bg-surface-muted text-left text-xs font-medium uppercase tracking-wide text-ink-faint">
-            <tr>
-              <th className="px-5 py-3">Number</th>
-              <th className="px-5 py-3">Customer</th>
-              <th className="px-5 py-3">Status</th>
-              <th className="px-5 py-3">Total</th>
-              <th className="px-5 py-3">Due</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(invoices ?? []).map((inv) => (
-              <tr key={inv.id} className="border-b border-border last:border-0 hover:bg-surface-muted">
-                <td className="px-5 py-3.5">
-                  <Link href={`/admin/invoices/${inv.id}`} className="font-medium text-ink hover:text-accent">
-                    {inv.invoice_number}
-                  </Link>
-                </td>
-                <td className="px-5 py-3.5 text-ink-soft">{inv.customers?.name}</td>
-                <td className="px-5 py-3.5">
-                  <StatusBadge status={inv.status} />
-                </td>
-                <td className="px-5 py-3.5 text-ink-soft">
-                  {new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(inv.total)}
-                </td>
-                <td className="px-5 py-3.5 text-ink-soft">{inv.due_date ?? "–"}</td>
-              </tr>
-            ))}
-            {(invoices ?? []).length === 0 && (
-              <tr>
-                <td colSpan={5} className="px-5 py-10 text-center text-ink-faint">
-                  No invoices found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      <div className="mt-4 flex flex-col gap-3">
+        {(invoices ?? []).map((inv) => (
+          <Link
+            key={inv.id}
+            href={`/admin/invoices/${inv.id}`}
+            className="group flex items-center justify-between rounded-3xl border border-border bg-surface p-5 shadow-sm transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-accent/30 hover:shadow-md"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-surface-sunken text-ink-soft">
+                <svg viewBox="0 0 20 20" fill="none" strokeWidth="1.6" stroke="currentColor" className="h-5 w-5">
+                  <rect x="4" y="3" width="12" height="14" rx="1.5" />
+                  <path d="M7 7h6M7 10h6M7 13h3" strokeLinecap="round" />
+                </svg>
+              </div>
+              <div>
+                <p className="font-medium text-ink group-hover:text-accent">{inv.invoice_number}</p>
+                <p className="text-xs text-ink-faint">{inv.customers?.name}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="hidden text-xs text-ink-faint sm:block">Due {inv.due_date ?? "–"}</span>
+              <span className="text-sm font-medium tabular-nums text-ink">
+                {new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(inv.total)}
+              </span>
+              <StatusBadge status={inv.status} />
+            </div>
+          </Link>
+        ))}
+        {(invoices ?? []).length === 0 && (
+          <p className="rounded-3xl border border-dashed border-border p-10 text-center text-ink-faint">
+            No invoices found.
+          </p>
+        )}
       </div>
     </div>
   )

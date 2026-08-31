@@ -25,7 +25,7 @@ export default async function PortalPage() {
           <Link
             key={inv.id}
             href={`/portal/invoices/${inv.id}`}
-            className="group flex items-center justify-between rounded-2xl border border-border bg-surface shadow-sm p-4 transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-accent/30 hover:shadow-md"
+            className="group flex items-center justify-between rounded-3xl border border-border bg-surface shadow-sm p-4 transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-accent/30 hover:shadow-md"
           >
             <div>
               <p className="font-medium text-ink">{inv.invoice_number}</p>
@@ -40,7 +40,7 @@ export default async function PortalPage() {
           </Link>
         ))}
         {(invoices ?? []).length === 0 && (
-          <p className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-ink-faint">
+          <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-ink-faint">
             No invoices yet.
           </p>
         )}

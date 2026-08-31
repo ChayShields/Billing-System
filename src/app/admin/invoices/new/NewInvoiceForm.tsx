@@ -6,7 +6,7 @@ import { buttonClasses } from "@/components/ui/Button"
 import type { Customer } from "@/lib/types"
 
 const inputClass =
-  "rounded-lg border border-border px-3 py-2 text-sm text-ink shadow-xs placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+  "rounded-xl border border-border px-3 py-2 text-sm text-ink shadow-xs placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
 
 export default function NewInvoiceForm({
   customers,
@@ -50,7 +50,7 @@ export default function NewInvoiceForm({
 
   return (
     <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-6">
-      <div className="rounded-2xl border border-border bg-surface shadow-sm p-5">
+      <div className="rounded-3xl border border-border bg-surface shadow-sm p-5">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className="block text-sm font-medium text-ink">Customer</label>
@@ -83,7 +83,7 @@ export default function NewInvoiceForm({
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border bg-surface shadow-sm p-5">
+      <div className="rounded-3xl border border-border bg-surface shadow-sm p-5">
         <label className="block text-sm font-medium text-ink">Line items</label>
         <div className="mt-3 flex flex-col gap-2">
           {items.map((item, i) => (
@@ -140,7 +140,7 @@ export default function NewInvoiceForm({
         </button>
       </div>
 
-      <div className="rounded-2xl border border-border bg-surface shadow-sm p-5">
+      <div className="rounded-3xl border border-border bg-surface shadow-sm p-5">
         <label className="block text-sm font-medium text-ink">Notes (optional)</label>
         <textarea
           value={notes}
@@ -150,7 +150,7 @@ export default function NewInvoiceForm({
         />
       </div>
 
-      <div className="flex items-center justify-between rounded-2xl border border-border bg-surface shadow-sm p-5">
+      <div className="flex items-center justify-between rounded-3xl border border-border bg-surface shadow-sm p-5">
         <p className="text-lg font-semibold tabular-nums text-ink">
           Total: {new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(total)}
         </p>
