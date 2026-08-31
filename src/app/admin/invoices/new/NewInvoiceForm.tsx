@@ -15,7 +15,11 @@ export default function NewInvoiceForm({
   customers: Customer[]
   defaultCustomerId?: string
 }) {
-  const [customerId, setCustomerId] = useState(defaultCustomerId ?? customers[0]?.id ?? "")
+  // No fallback to customers[0] - defaulting to "whichever customer sorts
+  // first" is a real footgun (an invoice, and its paid-confirmation email,
+  // could go to the wrong customer entirely if this page is opened without
+  // a customer pre-selected). Require an explicit choice instead.
+  const [customerId, setCustomerId] = useState(defaultCustomerId ?? "")
   const [dueDate, setDueDate] = useState("")
   const [notes, setNotes] = useState("")
   const [items, setItems] = useState<NewInvoiceItem[]>([
@@ -56,6 +60,9 @@ export default function NewInvoiceForm({
               required
               className={`mt-1.5 w-full ${inputClass}`}
             >
+              <option value="" disabled>
+                Select a customer...
+              </option>
               {customers.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
