@@ -72,6 +72,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               Sign out
             </button>
           </form>
+          <p className="mt-1 flex justify-center gap-2 px-3 text-[11px] text-ink-faint">
+            <Link href="/privacy-policy" className="hover:text-ink-soft">
+              Privacy
+            </Link>
+            <span>·</span>
+            <Link href="/terms-of-service" className="hover:text-ink-soft">
+              Terms
+            </Link>
+          </p>
         </div>
       </aside>
       <main className="flex-1 px-8 py-8">

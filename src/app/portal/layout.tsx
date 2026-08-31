@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { requireCustomer } from "@/lib/auth"
 import { logout } from "@/app/login/actions"
 
@@ -25,6 +26,15 @@ export default async function PortalLayout({ children }: { children: React.React
         </div>
       </header>
       <main className="mx-auto max-w-2xl px-4 py-8">{children}</main>
+      <footer className="mx-auto flex max-w-2xl justify-center gap-2 px-4 pb-8 text-xs text-ink-faint">
+        <Link href="/privacy-policy" className="hover:text-ink-soft">
+          Privacy Policy
+        </Link>
+        <span>·</span>
+        <Link href="/terms-of-service" className="hover:text-ink-soft">
+          Terms of Service
+        </Link>
+      </footer>
     </div>
   )
 }

@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { login } from "./actions"
 import { buttonClasses } from "@/components/ui/Button"
 
@@ -66,6 +67,16 @@ export default async function LoginPage({
             </button>
           </form>
         </div>
+
+        <p className="mt-6 text-center text-xs text-ink-faint">
+          <Link href="/privacy-policy" className="hover:text-ink-soft">
+            Privacy Policy
+          </Link>
+          {" · "}
+          <Link href="/terms-of-service" className="hover:text-ink-soft">
+            Terms of Service
+          </Link>
+        </p>
       </div>
     </div>
   )
