@@ -57,7 +57,7 @@ export default async function InvoicesPage({
         ))}
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-xl border border-border bg-surface">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
         <table className="w-full text-sm">
           <thead className="border-b border-border bg-surface-muted text-left text-xs font-medium uppercase tracking-wide text-ink-faint">
             <tr>

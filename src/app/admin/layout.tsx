@@ -40,9 +40,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   await requireAdmin()
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="flex w-60 shrink-0 flex-col border-r border-border bg-surface">
-        <div className="flex h-16 items-center border-b border-border px-6">
+    <div className="flex min-h-screen bg-surface-sunken">
+      <aside className="relative z-10 flex w-64 shrink-0 flex-col bg-surface shadow-lg">
+        <div className="flex h-16 items-center gap-2.5 px-6">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-b from-accent to-accent-hover text-white shadow-accent">
+            <svg viewBox="0 0 20 20" fill="none" strokeWidth="1.7" stroke="currentColor" className="h-4 w-4">
+              <rect x="4" y="3" width="12" height="14" rx="1.5" />
+              <path d="M7 7h6M7 10h6M7 13h3" strokeLinecap="round" />
+            </svg>
+          </div>
           <Link href="/admin" className="text-[15px] font-semibold tracking-tight text-ink">
             Billing System
           </Link>
@@ -54,7 +60,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </NavLink>
           ))}
         </nav>
-        <div className="border-t border-border p-3">
+        <div className="p-3">
           <form action={logout}>
             <button
               type="submit"

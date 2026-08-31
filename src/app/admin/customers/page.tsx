@@ -19,7 +19,7 @@ export default async function CustomersPage() {
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <div className="overflow-hidden rounded-xl border border-border bg-surface">
+          <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
             <table className="w-full text-sm">
               <thead className="border-b border-border bg-surface-muted text-left text-xs font-medium uppercase tracking-wide text-ink-faint">
                 <tr>
@@ -53,37 +53,37 @@ export default async function CustomersPage() {
         </div>
 
         <div>
-          <div className="rounded-xl border border-border bg-surface p-5">
+          <div className="rounded-2xl border border-border bg-surface shadow-sm p-5">
             <h2 className="text-sm font-semibold text-ink">Add a customer</h2>
             <form action={createCustomer} className="mt-4 flex flex-col gap-3">
               <input
                 name="name"
                 placeholder="Name"
                 required
-                className="rounded-lg border border-border px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                className="rounded-lg border border-border px-3 py-2 text-sm text-ink shadow-xs placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
               <input
                 name="email"
                 type="email"
                 placeholder="Email"
                 required
-                className="rounded-lg border border-border px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                className="rounded-lg border border-border px-3 py-2 text-sm text-ink shadow-xs placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
               <input
                 name="company"
                 placeholder="Company (optional)"
-                className="rounded-lg border border-border px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                className="rounded-lg border border-border px-3 py-2 text-sm text-ink shadow-xs placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
               <input
                 name="phone"
                 placeholder="Phone (optional)"
-                className="rounded-lg border border-border px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                className="rounded-lg border border-border px-3 py-2 text-sm text-ink shadow-xs placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
               <textarea
                 name="address"
                 placeholder="Address (optional)"
                 rows={2}
-                className="rounded-lg border border-border px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                className="rounded-lg border border-border px-3 py-2 text-sm text-ink shadow-xs placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
               <button type="submit" className={buttonClasses("primary", "mt-1")}>
                 Add customer

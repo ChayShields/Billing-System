@@ -25,7 +25,7 @@ export default async function PortalPage() {
           <Link
             key={inv.id}
             href={`/portal/invoices/${inv.id}`}
-            className="flex items-center justify-between rounded-xl border border-border bg-surface p-4 transition-colors hover:border-accent/40"
+            className="group flex items-center justify-between rounded-2xl border border-border bg-surface shadow-sm p-4 transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-accent/30 hover:shadow-md"
           >
             <div>
               <p className="font-medium text-ink">{inv.invoice_number}</p>

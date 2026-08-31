@@ -64,7 +64,7 @@ export default async function CustomerDetailPage({
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <h2 className="text-sm font-semibold text-ink">Invoices</h2>
-          <div className="mt-3 overflow-hidden rounded-xl border border-border bg-surface">
+          <div className="mt-3 overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
             <table className="w-full text-sm">
               <thead className="border-b border-border bg-surface-muted text-left text-xs font-medium uppercase tracking-wide text-ink-faint">
                 <tr>
@@ -102,7 +102,7 @@ export default async function CustomerDetailPage({
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="rounded-xl border border-border bg-surface p-5">
+          <div className="rounded-2xl border border-border bg-surface shadow-sm p-5">
             <h2 className="text-sm font-semibold text-ink">Contact</h2>
             <dl className="mt-3 space-y-3 text-sm">
               <div>
@@ -120,7 +120,7 @@ export default async function CustomerDetailPage({
             </dl>
           </div>
 
-          <div className="rounded-xl border border-border bg-surface p-5">
+          <div className="rounded-2xl border border-border bg-surface shadow-sm p-5">
             <h2 className="text-sm font-semibold text-ink">Portal access</h2>
             {existingProfile ? (
               <p className="mt-2 flex items-center gap-1.5 text-sm text-status-paid-text">
