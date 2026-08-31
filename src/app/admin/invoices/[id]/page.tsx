@@ -5,6 +5,7 @@ import type { Customer, Invoice, InvoiceItem } from "@/lib/types"
 import StatusBadge from "@/components/ui/StatusBadge"
 import { buttonClasses } from "@/components/ui/Button"
 import MarkPaidButton from "./MarkPaidButton"
+import SendInvoiceButton from "./SendInvoiceButton"
 import { updateInvoiceStatus } from "../actions"
 
 export default async function InvoiceDetailPage({
@@ -26,10 +27,6 @@ export default async function InvoiceDetailPage({
   const formatGBP = (n: number) =>
     new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n)
 
-  async function markSent() {
-    "use server"
-    await updateInvoiceStatus(invoice!.id, "sent")
-  }
   async function markOverdue() {
     "use server"
     await updateInvoiceStatus(invoice!.id, "overdue")
@@ -109,13 +106,7 @@ export default async function InvoiceDetailPage({
       {invoice.status !== "paid" && (
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <MarkPaidButton invoiceId={invoice.id} />
-          {invoice.status === "draft" && (
-            <form action={markSent}>
-              <button type="submit" className={buttonClasses("secondary")}>
-                Mark as Sent
-              </button>
-            </form>
-          )}
+          {invoice.status === "draft" && <SendInvoiceButton invoiceId={invoice.id} />}
           {invoice.status !== "overdue" && (
             <form action={markOverdue}>
               <button type="submit" className={buttonClasses("secondary")}>
