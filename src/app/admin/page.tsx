@@ -30,18 +30,18 @@ export default async function AdminDashboard() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-ink">Dashboard</h1>
           <p className="mt-1 text-sm text-ink-soft">An overview of your customers and invoices.</p>
         </div>
-        <Link href="/admin/invoices/new" className={buttonClasses("primary")}>
+        <Link href="/admin/invoices/new" className={buttonClasses("primary", "w-full sm:w-auto justify-center")}>
           New Invoice
         </Link>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-5 lg:grid-cols-4">
-        <div className="rise-in relative col-span-2 row-span-2 overflow-hidden rounded-3xl bg-gradient-to-br from-accent to-[#2f2596] p-7 text-white shadow-lg">
+      <div className="mt-6 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
+        <div className="rise-in relative col-span-2 row-span-2 overflow-hidden rounded-3xl bg-gradient-to-br from-accent to-[#2f2596] p-5 text-white shadow-lg sm:p-7">
           <div
             aria-hidden
             className="pointer-events-none absolute -right-10 -top-16 h-56 w-56 rounded-full bg-white/10 blur-2xl"
@@ -53,7 +53,7 @@ export default async function AdminDashboard() {
           <p className="relative text-xs font-medium uppercase tracking-wide text-white/70">
             Outstanding balance
           </p>
-          <p className="relative mt-3 text-5xl font-semibold tabular-nums">{formatGBP(totals.outstanding)}</p>
+          <p className="relative mt-3 text-3xl font-semibold tabular-nums sm:text-5xl">{formatGBP(totals.outstanding)}</p>
           <p className="relative mt-3 max-w-xs text-sm text-white/70">
             Across sent and draft invoices awaiting payment.
           </p>
