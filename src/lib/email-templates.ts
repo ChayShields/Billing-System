@@ -13,9 +13,9 @@ function lineItemRows(items: InvoiceItem[]) {
       (item) => `
         <tr>
           <td style="padding:10px 0; border-bottom:1px solid #e5e9f0; font-size:14px; color:#0f172a;">${item.description}</td>
-          <td style="padding:10px 0; border-bottom:1px solid #e5e9f0; font-size:14px; color:#475569; text-align:right;">${item.quantity}</td>
-          <td style="padding:10px 0; border-bottom:1px solid #e5e9f0; font-size:14px; color:#475569; text-align:right;">${formatGBP(item.unit_price)}</td>
-          <td style="padding:10px 0; border-bottom:1px solid #e5e9f0; font-size:14px; font-weight:600; color:#0f172a; text-align:right;">${formatGBP(item.amount)}</td>
+          <td style="padding:10px 0 10px 10px; border-bottom:1px solid #e5e9f0; font-size:14px; color:#475569; text-align:right;">${item.quantity}</td>
+          <td style="padding:10px 0 10px 10px; border-bottom:1px solid #e5e9f0; font-size:14px; color:#475569; text-align:right; white-space:nowrap;">${formatGBP(item.unit_price)}</td>
+          <td style="padding:10px 0 10px 10px; border-bottom:1px solid #e5e9f0; font-size:14px; font-weight:600; color:#0f172a; text-align:right; white-space:nowrap;">${formatGBP(item.amount)}</td>
         </tr>`
     )
     .join("")
@@ -92,15 +92,27 @@ export function invoiceEmail(
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>${isPaid ? "Payment received" : "Your invoice"} - ${invoice.invoice_number}</title>
+    <style>
+      /* Most modern mail clients (Apple Mail, Gmail app, Outlook.com) support
+         this; older desktop Outlook ignores it and just sees the base styles,
+         which still work fine - this only tightens things up further. */
+      @media only screen and (max-width: 480px) {
+        .email-header { padding: 20px 20px !important; }
+        .email-body { padding: 20px !important; }
+        .email-footer { padding: 16px 20px !important; }
+        .email-items td { font-size: 13px !important; padding-top: 8px !important; padding-bottom: 8px !important; }
+        .email-wrapper { padding: 16px 8px !important; }
+      }
+    </style>
   </head>
   <body style="margin:0; padding:0; background-color:#eef1f6; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#eef1f6; padding:32px 16px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="email-wrapper" style="background-color:#eef1f6; padding:32px 16px;">
       <tr>
         <td align="center">
           <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background-color:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 1px 2px rgba(15,23,42,0.04);">
 
             <tr>
-              <td style="background-color:#4338ca; padding:28px 32px;">
+              <td class="email-header" style="background-color:#4338ca; padding:28px 32px;">
                 <table role="presentation" cellpadding="0" cellspacing="0">
                   <tr>
                     <td style="width:32px; height:32px; background-color:rgba(255,255,255,0.15); border-radius:8px; text-align:center; vertical-align:middle;">
@@ -115,7 +127,7 @@ export function invoiceEmail(
             </tr>
 
             <tr>
-              <td style="padding:32px;">
+              <td class="email-body" style="padding:32px;">
                 ${statusBox}
 
                 <p style="margin:0 0 16px; font-size:15px; line-height:1.6; color:#0f172a;">
@@ -136,12 +148,12 @@ export function invoiceEmail(
                   </tr>
                 </table>
 
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="email-items">
                   <tr>
                     <td style="padding-bottom:8px; border-bottom:2px solid #0f172a; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:#94a3b8;">Description</td>
-                    <td style="padding-bottom:8px; border-bottom:2px solid #0f172a; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:#94a3b8; text-align:right;">Qty</td>
-                    <td style="padding-bottom:8px; border-bottom:2px solid #0f172a; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:#94a3b8; text-align:right;">Price</td>
-                    <td style="padding-bottom:8px; border-bottom:2px solid #0f172a; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:#94a3b8; text-align:right;">Amount</td>
+                    <td style="padding:0 0 8px 10px; border-bottom:2px solid #0f172a; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:#94a3b8; text-align:right; white-space:nowrap;">Qty</td>
+                    <td style="padding:0 0 8px 10px; border-bottom:2px solid #0f172a; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:#94a3b8; text-align:right; white-space:nowrap;">Price</td>
+                    <td style="padding:0 0 8px 10px; border-bottom:2px solid #0f172a; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:#94a3b8; text-align:right; white-space:nowrap;">Amount</td>
                   </tr>
                   ${lineItemRows(items)}
                   <tr>
@@ -164,7 +176,7 @@ export function invoiceEmail(
             </tr>
 
             <tr>
-              <td style="padding:20px 32px; border-top:1px solid #e5e9f0; background-color:#f8fafc;">
+              <td class="email-footer" style="padding:20px 32px; border-top:1px solid #e5e9f0; background-color:#f8fafc;">
                 <p style="margin:0; font-size:12px; line-height:1.5; color:#94a3b8;">
                   Sent by Billing System on behalf of Chay Shields &middot;
                   <a href="https://hireme.link" style="color:#94a3b8;">hireme.link</a>
