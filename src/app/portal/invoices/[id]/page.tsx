@@ -47,7 +47,26 @@ export default async function PortalInvoiceDetailPage({
         </div>
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-3xl border border-border bg-surface shadow-sm">
+      {/* Line items: stacked cards on phones, a real table from sm up */}
+      <div className="mt-6 flex flex-col gap-2 sm:hidden">
+        {invoice.invoice_items.map((item) => (
+          <div key={item.id} className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
+            <p className="text-sm font-medium text-ink">{item.description}</p>
+            <div className="mt-2 flex items-center justify-between text-sm">
+              <span className="text-ink-soft">
+                {item.quantity} &times; {formatGBP(item.unit_price)}
+              </span>
+              <span className="font-semibold text-ink">{formatGBP(item.amount)}</span>
+            </div>
+          </div>
+        ))}
+        <div className="flex items-center justify-between rounded-2xl bg-surface-muted px-4 py-3">
+          <span className="font-semibold text-ink">Total</span>
+          <span className="text-lg font-semibold text-ink">{formatGBP(invoice.total)}</span>
+        </div>
+      </div>
+
+      <div className="mt-6 hidden overflow-hidden rounded-3xl border border-border bg-surface shadow-sm sm:block">
         <table className="w-full text-sm">
           <thead className="border-b border-border bg-surface-muted text-left text-xs font-medium uppercase tracking-wide text-ink-faint">
             <tr>

@@ -56,16 +56,16 @@ export default async function CustomerDetailPage({
         &larr; Customers
       </Link>
 
-      <div className="mt-3 flex items-start justify-between">
+      <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-ink">{customer.name}</h1>
           {customer.company && <p className="text-sm text-ink-soft">{customer.company}</p>}
         </div>
         <div className="flex items-center gap-3">
-          <Link href={`/admin/customers/${customer.id}/edit`} className={buttonClasses("secondary")}>
+          <Link href={`/admin/customers/${customer.id}/edit`} className={buttonClasses("secondary", "flex-1 justify-center sm:flex-none")}>
             Edit
           </Link>
-          <Link href={`/admin/invoices/new?customer=${customer.id}`} className={buttonClasses("primary")}>
+          <Link href={`/admin/invoices/new?customer=${customer.id}`} className={buttonClasses("primary", "flex-1 justify-center sm:flex-none")}>
             New Invoice
           </Link>
         </div>

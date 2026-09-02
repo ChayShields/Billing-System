@@ -31,22 +31,22 @@ export default async function InvoicesPage({
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-ink">Invoices</h1>
           <p className="mt-1 text-sm text-ink-soft">Every invoice you've raised.</p>
         </div>
-        <Link href="/admin/invoices/new" className={buttonClasses("primary")}>
+        <Link href="/admin/invoices/new" className={buttonClasses("primary", "w-full sm:w-auto justify-center")}>
           New Invoice
         </Link>
       </div>
 
-      <div className="mt-5 flex gap-1.5">
+      <div className="-mx-4 mt-5 flex gap-1.5 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0 sm:pb-0">
         {FILTERS.map((f) => (
           <Link
             key={f.label}
             href={f.value ? `/admin/invoices?status=${f.value}` : "/admin/invoices"}
-            className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+            className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
               (status ?? undefined) === f.value
                 ? "bg-ink text-white"
                 : "bg-surface text-ink-soft hover:bg-surface-sunken"
