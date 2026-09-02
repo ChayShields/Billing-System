@@ -62,9 +62,6 @@ export default function AdminSidebar({
           where touch hit-testing on `position: sticky` elements inside a flex
           container can desync from where the element is actually rendered. */}
       <div className="fixed left-0 right-0 top-0 z-20 flex h-14 items-center justify-between border-b border-border bg-surface px-4 shadow-sm md:hidden">
-        <Link href="/admin" className="text-[15px] font-semibold tracking-tight text-ink">
-          Billing System
-        </Link>
         <button
           type="button"
           onClick={() => setOpen(true)}
@@ -76,6 +73,10 @@ export default function AdminSidebar({
             <path d="M3 5h14M3 10h14M3 15h14" strokeLinecap="round" />
           </svg>
         </button>
+        <Link href="/admin" className="text-[15px] font-semibold tracking-tight text-ink">
+          Billing System
+        </Link>
+        <div className="h-10 w-10" aria-hidden="true" />
       </div>
       {/* Spacer to reserve the fixed top bar's height in normal flow */}
       <div className="h-14 md:hidden" />
