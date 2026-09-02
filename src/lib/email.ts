@@ -1,6 +1,6 @@
 import { Resend } from "resend"
 import type { Customer, Invoice, InvoiceItem } from "@/lib/types"
-import { invoiceEmail } from "@/lib/email-templates"
+import { invoiceEmail, reminderEmail } from "@/lib/email-templates"
 
 function getResend() {
   const apiKey = process.env.RESEND_API_KEY
@@ -20,6 +20,21 @@ export async function sendInvoiceIssued(invoice: Invoice, customer: Customer, it
     to: customer.email,
     subject: `Invoice ${invoice.invoice_number} from Chay Shields`,
     html: invoiceEmail(invoice, customer, items, "sent"),
+  })
+}
+
+export async function sendPaymentReminder(invoice: Invoice, customer: Customer) {
+  const resend = getResend()
+  if (!resend) {
+    console.warn(`RESEND_API_KEY not set - skipped reminder email for ${invoice.invoice_number}.`)
+    return
+  }
+
+  await resend.emails.send({
+    from: "Chay Shields <billing@hireme.link>",
+    to: customer.email,
+    subject: `Reminder: ${invoice.invoice_number} due soon`,
+    html: reminderEmail(invoice, customer),
   })
 }
 

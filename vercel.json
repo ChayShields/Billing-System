@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/mark-overdue",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/send-reminders",
+      "schedule": "5 6 * * *"
     }
   ]
 }

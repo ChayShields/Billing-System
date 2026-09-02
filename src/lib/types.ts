@@ -28,6 +28,7 @@ export type Invoice = {
   issue_date: string
   due_date: string | null
   paid_date: string | null
+  reminder_sent_at: string | null
   notes: string | null
   total: number
   created_at: string
