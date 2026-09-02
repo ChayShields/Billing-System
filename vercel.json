@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/send-reminders",
       "schedule": "5 6 * * *"
+    },
+    {
+      "path": "/api/cron/generate-recurring-invoices",
+      "schedule": "10 6 * * *"
     }
   ]
 }

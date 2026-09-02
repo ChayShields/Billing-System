@@ -4,8 +4,9 @@ import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { buttonClasses } from "@/components/ui/Button"
 import StatusBadge from "@/components/ui/StatusBadge"
-import type { Customer, Invoice } from "@/lib/types"
-import { createCustomerLogin, resetCustomerPassword } from "../actions"
+import type { Customer, Invoice, RecurringItem } from "@/lib/types"
+import { createCustomerLogin, resetCustomerPassword, createRecurringItem } from "../actions"
+import CancelRecurringItemButton from "./CancelRecurringItemButton"
 
 export default async function CustomerDetailPage({
   params,
@@ -30,6 +31,14 @@ export default async function CustomerDetailPage({
     .order("issue_date", { ascending: false })
     .returns<Invoice[]>()
 
+  const { data: recurringItems } = await supabase
+    .from("recurring_items")
+    .select("*")
+    .eq("customer_id", id)
+    .eq("active", true)
+    .order("next_due_date")
+    .returns<RecurringItem[]>()
+
   const admin = createAdminClient()
   const { data: existingProfile } = await admin
     .from("profiles")
@@ -45,6 +54,11 @@ export default async function CustomerDetailPage({
   async function resetAction() {
     "use server"
     await resetCustomerPassword(customer!.id, customer!.email)
+  }
+
+  async function addRecurringAction(formData: FormData) {
+    "use server"
+    await createRecurringItem(customer!.id, formData)
   }
 
   const formatGBP = (n: number) =>
@@ -133,6 +147,73 @@ export default async function CustomerDetailPage({
                 <dd className="whitespace-pre-line text-ink">{customer.address ?? "–"}</dd>
               </div>
             </dl>
+          </div>
+
+          <div className="rounded-3xl border border-border bg-surface shadow-sm p-5">
+            <h2 className="text-sm font-semibold text-ink">Recurring billing</h2>
+            <p className="mt-1 text-xs text-ink-soft">
+              Auto-generates and sends an invoice 14 days before each renewal.
+            </p>
+
+            {(recurringItems ?? []).length > 0 && (
+              <div className="mt-3 flex flex-col gap-2">
+                {recurringItems!.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between rounded-xl border border-border bg-surface-sunken px-3 py-2"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-ink">{item.description}</p>
+                      <p className="text-xs text-ink-faint">
+                        {formatGBP(item.amount)} / {item.interval_unit} &middot; next{" "}
+                        {item.next_due_date}
+                      </p>
+                    </div>
+                    <CancelRecurringItemButton recurringItemId={item.id} customerId={customer.id} />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <form action={addRecurringAction} className="mt-4 flex flex-col gap-2">
+              <input
+                name="description"
+                placeholder="e.g. Web Hosting - Annual"
+                required
+                className="rounded-xl border border-border px-3 py-2 text-sm text-ink shadow-xs placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+              />
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  name="amount"
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  placeholder="Amount"
+                  required
+                  className="rounded-xl border border-border px-3 py-2 text-sm text-ink shadow-xs placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                />
+                <select
+                  name="interval_unit"
+                  defaultValue="year"
+                  className="rounded-xl border border-border px-3 py-2 text-sm text-ink shadow-xs focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                >
+                  <option value="year">Yearly</option>
+                  <option value="month">Monthly</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-ink-faint">First due date</label>
+                <input
+                  name="next_due_date"
+                  type="date"
+                  required
+                  className="mt-1 w-full rounded-xl border border-border px-3 py-2 text-sm text-ink shadow-xs focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                />
+              </div>
+              <button type="submit" className={buttonClasses("secondary", "mt-1 w-full")}>
+                Add recurring item
+              </button>
+            </form>
           </div>
 
           <div className="rounded-3xl border border-border bg-surface shadow-sm p-5">

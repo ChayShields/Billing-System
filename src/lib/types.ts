@@ -37,6 +37,17 @@ export type Invoice = {
   invoice_items?: InvoiceItem[]
 }
 
+export type RecurringItem = {
+  id: string
+  customer_id: string
+  description: string
+  amount: number
+  interval_unit: "month" | "year"
+  next_due_date: string
+  active: boolean
+  created_at: string
+}
+
 export type Profile = {
   id: string
   role: "admin" | "customer"

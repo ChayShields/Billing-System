@@ -86,6 +86,41 @@ export async function createCustomerLogin(customerId: string, email: string) {
   revalidatePath(`/admin/customers/${customerId}`)
 }
 
+// Adds a recurring billing item (e.g. yearly hosting/domain renewal) for a
+// customer. The generate-recurring-invoices cron picks these up and
+// auto-creates + auto-sends an invoice 14 days before each due date.
+export async function createRecurringItem(customerId: string, formData: FormData) {
+  const supabase = await createClient()
+
+  const { error } = await supabase.from("recurring_items").insert({
+    customer_id: customerId,
+    description: String(formData.get("description") ?? ""),
+    amount: Number(formData.get("amount") ?? 0),
+    interval_unit: String(formData.get("interval_unit") ?? "year"),
+    next_due_date: String(formData.get("next_due_date") ?? ""),
+  })
+
+  if (error) throw new Error(error.message)
+
+  revalidatePath(`/admin/customers/${customerId}`)
+}
+
+// Cancels a recurring item - kept as a row (not deleted) so past invoices
+// it generated still show what created them if that's ever worth knowing,
+// it just stops being picked up by the cron.
+export async function cancelRecurringItem(recurringItemId: string, customerId: string) {
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from("recurring_items")
+    .update({ active: false })
+    .eq("id", recurringItemId)
+
+  if (error) throw new Error(error.message)
+
+  revalidatePath(`/admin/customers/${customerId}`)
+}
+
 // Sends a fresh "set your password" link to an existing customer login -
 // used when Chay needs to reset a customer's password (forgotten,
 // suspected compromised, etc.), not just at first creation.
