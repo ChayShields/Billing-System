@@ -37,6 +37,14 @@ export type Invoice = {
   invoice_items?: InvoiceItem[]
 }
 
+export type InvoicePayment = {
+  id: string
+  invoice_id: string
+  amount: number
+  paid_date: string
+  created_at: string
+}
+
 export type RecurringItem = {
   id: string
   customer_id: string

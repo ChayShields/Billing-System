@@ -1,13 +1,14 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
-import type { Customer, Invoice, InvoiceItem } from "@/lib/types"
+import type { Customer, Invoice, InvoiceItem, InvoicePayment } from "@/lib/types"
 import StatusBadge from "@/components/ui/StatusBadge"
 import { buttonClasses } from "@/components/ui/Button"
 import MarkPaidButton from "./MarkPaidButton"
 import SendInvoiceButton from "./SendInvoiceButton"
 import ResendInvoiceButton from "./ResendInvoiceButton"
-import { updateInvoiceStatus } from "../actions"
+import DeletePaymentButton from "./DeletePaymentButton"
+import { updateInvoiceStatus, recordPayment } from "../actions"
 
 export default async function InvoiceDetailPage({
   params,
@@ -25,12 +26,27 @@ export default async function InvoiceDetailPage({
 
   if (!invoice) notFound()
 
+  const { data: payments } = await supabase
+    .from("invoice_payments")
+    .select("*")
+    .eq("invoice_id", id)
+    .order("paid_date", { ascending: false })
+    .returns<InvoicePayment[]>()
+
+  const totalPaid = (payments ?? []).reduce((sum, p) => sum + p.amount, 0)
+  const remaining = Math.max(invoice.total - totalPaid, 0)
+
   const formatGBP = (n: number) =>
     new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n)
 
   async function markOverdue() {
     "use server"
     await updateInvoiceStatus(invoice!.id, "overdue")
+  }
+
+  async function addPaymentAction(formData: FormData) {
+    "use server"
+    await recordPayment(invoice!.id, formData)
   }
 
   return (
@@ -133,6 +149,69 @@ export default async function InvoiceDetailPage({
           </p>
         )}
       </div>
+
+      {invoice.status !== "draft" && (
+        <div className="mt-4 rounded-3xl border border-border bg-surface shadow-sm p-5">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-ink">Payments</h2>
+            {invoice.status !== "paid" && (
+              <span className="text-sm text-ink-soft">
+                {formatGBP(totalPaid)} of {formatGBP(invoice.total)} paid
+                {remaining > 0 && (
+                  <span className="ml-1 font-medium text-status-overdue-text">
+                    ({formatGBP(remaining)} remaining)
+                  </span>
+                )}
+              </span>
+            )}
+          </div>
+
+          {(payments ?? []).length > 0 && (
+            <div className="mt-3 flex flex-col gap-1.5">
+              {payments!.map((p) => (
+                <div key={p.id} className="flex items-center justify-between text-sm">
+                  <span className="text-ink-soft">{p.paid_date}</span>
+                  <div className="flex items-center gap-2.5">
+                    <span className="font-medium tabular-nums text-ink">{formatGBP(p.amount)}</span>
+                    {invoice.status !== "paid" && (
+                      <DeletePaymentButton paymentId={p.id} invoiceId={invoice.id} />
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {invoice.status !== "paid" && (
+            <form action={addPaymentAction} className="mt-4 flex items-end gap-2">
+              <div className="flex-1">
+                <label className="block text-xs text-ink-faint">Amount</label>
+                <input
+                  name="amount"
+                  type="number"
+                  min={0.01}
+                  step="0.01"
+                  required
+                  placeholder={formatGBP(remaining)}
+                  className="mt-1 w-full rounded-xl border border-border px-3 py-2 text-sm text-ink shadow-xs placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="block text-xs text-ink-faint">Date</label>
+                <input
+                  name="paid_date"
+                  type="date"
+                  defaultValue={new Date().toISOString().slice(0, 10)}
+                  className="mt-1 w-full rounded-xl border border-border px-3 py-2 text-sm text-ink shadow-xs focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                />
+              </div>
+              <button type="submit" className={buttonClasses("secondary")}>
+                Log payment
+              </button>
+            </form>
+          )}
+        </div>
+      )}
 
       {invoice.status !== "paid" && (
         <div className="mt-6 flex flex-wrap items-center gap-3">

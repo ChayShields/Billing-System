@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 import { requireCustomer } from "@/lib/auth"
 import { createClient } from "@/lib/supabase/server"
 import StatusBadge from "@/components/ui/StatusBadge"
-import type { Invoice, InvoiceItem } from "@/lib/types"
+import type { Invoice, InvoiceItem, InvoicePayment } from "@/lib/types"
 
 export default async function PortalInvoiceDetailPage({
   params,
@@ -22,6 +22,16 @@ export default async function PortalInvoiceDetailPage({
     .single<Invoice & { invoice_items: InvoiceItem[] }>()
 
   if (!invoice) notFound()
+
+  const { data: payments } = await supabase
+    .from("invoice_payments")
+    .select("*")
+    .eq("invoice_id", id)
+    .order("paid_date", { ascending: false })
+    .returns<InvoicePayment[]>()
+
+  const totalPaid = (payments ?? []).reduce((sum, p) => sum + p.amount, 0)
+  const remaining = Math.max(invoice.total - totalPaid, 0)
 
   const formatGBP = (n: number) =>
     new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n)
@@ -103,6 +113,30 @@ export default async function PortalInvoiceDetailPage({
         <div className="mt-4 rounded-3xl border border-border bg-surface shadow-sm p-4">
           <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">Notes</p>
           <p className="mt-1 whitespace-pre-line text-sm text-ink-soft">{invoice.notes}</p>
+        </div>
+      )}
+
+      {(payments ?? []).length > 0 && invoice.status !== "paid" && (
+        <div className="mt-4 rounded-3xl border border-border bg-surface shadow-sm p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">Payments received</p>
+            <p className="text-sm text-ink-soft">
+              {formatGBP(totalPaid)} of {formatGBP(invoice.total)}
+              {remaining > 0 && (
+                <span className="ml-1 font-medium text-status-overdue-text">
+                  ({formatGBP(remaining)} remaining)
+                </span>
+              )}
+            </p>
+          </div>
+          <div className="mt-2 flex flex-col gap-1">
+            {payments!.map((p) => (
+              <div key={p.id} className="flex items-center justify-between text-sm">
+                <span className="text-ink-soft">{p.paid_date}</span>
+                <span className="font-medium tabular-nums text-ink">{formatGBP(p.amount)}</span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
