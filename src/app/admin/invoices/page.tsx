@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 import { buttonClasses } from "@/components/ui/Button"
-import StatusBadge from "@/components/ui/StatusBadge"
+import InvoiceList from "./InvoiceList"
 import type { Customer, Invoice, InvoiceStatus } from "@/lib/types"
 
 const FILTERS: { label: string; value?: InvoiceStatus }[] = [
@@ -57,40 +57,7 @@ export default async function InvoicesPage({
         ))}
       </div>
 
-      <div className="mt-4 flex flex-col gap-3">
-        {(invoices ?? []).map((inv) => (
-          <Link
-            key={inv.id}
-            href={`/admin/invoices/${inv.id}`}
-            className="group flex items-center justify-between rounded-3xl border border-border bg-surface p-5 shadow-sm transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-accent/30 hover:shadow-md"
-          >
-            <div className="flex items-center gap-3.5">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-surface-sunken text-ink-soft">
-                <svg viewBox="0 0 20 20" fill="none" strokeWidth="1.6" stroke="currentColor" className="h-5 w-5">
-                  <rect x="4" y="3" width="12" height="14" rx="1.5" />
-                  <path d="M7 7h6M7 10h6M7 13h3" strokeLinecap="round" />
-                </svg>
-              </div>
-              <div>
-                <p className="font-medium text-ink group-hover:text-accent">{inv.invoice_number}</p>
-                <p className="text-xs text-ink-faint">{inv.customers?.name}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="hidden text-xs text-ink-faint sm:block">Due {inv.due_date ?? "–"}</span>
-              <span className="text-sm font-medium tabular-nums text-ink">
-                {new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(inv.total)}
-              </span>
-              <StatusBadge status={inv.status} />
-            </div>
-          </Link>
-        ))}
-        {(invoices ?? []).length === 0 && (
-          <p className="rounded-3xl border border-dashed border-border p-10 text-center text-ink-faint">
-            No invoices found.
-          </p>
-        )}
-      </div>
+      <InvoiceList invoices={invoices ?? []} />
     </div>
   )
 }
