@@ -61,6 +61,15 @@ export async function createCustomerLogin(customerId: string, email: string) {
     email_confirm: true,
     password: crypto.randomUUID(),
   })
+  // A duplicate email is an expected, explainable case (this exact email
+  // already has a login elsewhere - another customer, or even Chay's own
+  // admin account), not a real crash. Handle it here rather than throwing:
+  // Next.js strips the real error message before it reaches the browser
+  // in production, so a generic throw would only ever show a vague
+  // "something went wrong" with no way to tell what actually happened.
+  if (createError?.code === "email_exists") {
+    redirect(`/admin/customers/${customerId}?loginError=duplicate`)
+  }
   if (createError) throw new Error(createError.message)
 
   const { error: profileError } = await admin.from("profiles").insert({

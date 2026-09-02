@@ -10,10 +10,13 @@ import CancelRecurringItemButton from "./CancelRecurringItemButton"
 
 export default async function CustomerDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ loginError?: string }>
 }) {
   const { id } = await params
+  const { loginError } = await searchParams
   const supabase = await createClient()
 
   const { data: customer } = await supabase
@@ -218,6 +221,13 @@ export default async function CustomerDetailPage({
 
           <div className="rounded-3xl border border-border bg-surface shadow-sm p-5">
             <h2 className="text-sm font-semibold text-ink">Portal access</h2>
+            {loginError === "duplicate" && (
+              <p className="mt-2 rounded-xl bg-status-overdue-bg px-3 py-2 text-xs text-status-overdue-text">
+                Couldn&apos;t create a login - {customer.email} is already registered to another account
+                elsewhere in the system. Use a different email for this customer, or check whether they
+                already have a login under this one.
+              </p>
+            )}
             {existingProfile ? (
               <div className="mt-2">
                 <p className="flex items-center gap-1.5 text-sm text-status-paid-text">
