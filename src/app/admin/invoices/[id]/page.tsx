@@ -6,6 +6,7 @@ import StatusBadge from "@/components/ui/StatusBadge"
 import { buttonClasses } from "@/components/ui/Button"
 import MarkPaidButton from "./MarkPaidButton"
 import SendInvoiceButton from "./SendInvoiceButton"
+import ResendInvoiceButton from "./ResendInvoiceButton"
 import { updateInvoiceStatus } from "../actions"
 
 export default async function InvoiceDetailPage({
@@ -47,6 +48,7 @@ export default async function InvoiceDetailPage({
           </Link>
         </div>
         <div className="flex items-center gap-3">
+          {invoice.status !== "draft" && <ResendInvoiceButton invoiceId={invoice.id} />}
           {invoice.status === "paid" && (
             <a
               href={`/api/invoices/${invoice.id}/pdf`}

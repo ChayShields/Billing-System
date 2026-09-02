@@ -92,6 +92,30 @@ export async function markInvoicePaid(invoiceId: string) {
   revalidatePath("/admin/invoices")
 }
 
+// Re-fires the invoice email on demand without changing status - the
+// customer lost it, asked again, etc. Sends whichever version matches the
+// invoice's current status (paid confirmation if already paid, otherwise
+// the standard "here's what you owe" email); doesn't apply to drafts,
+// which were never issued in the first place.
+export async function resendInvoice(invoiceId: string) {
+  const supabase = await createClient()
+
+  const { data: invoice, error } = await supabase
+    .from("invoices")
+    .select("*, customers(*), invoice_items(*)")
+    .eq("id", invoiceId)
+    .single<Invoice & { customers: Customer; invoice_items: InvoiceItem[] }>()
+
+  if (error) throw new Error(error.message)
+  if (invoice.status === "draft") throw new Error("Can't resend a draft invoice - send it first.")
+
+  if (invoice.status === "paid") {
+    await sendPaidConfirmation(invoice, invoice.customers, invoice.invoice_items)
+  } else {
+    await sendInvoiceIssued(invoice, invoice.customers, invoice.invoice_items)
+  }
+}
+
 export async function updateInvoiceStatus(invoiceId: string, status: "draft" | "overdue") {
   const supabase = await createClient()
   const { error } = await supabase.from("invoices").update({ status }).eq("id", invoiceId)
