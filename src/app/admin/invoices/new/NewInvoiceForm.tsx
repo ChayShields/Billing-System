@@ -87,47 +87,52 @@ export default function NewInvoiceForm({
         <label className="block text-sm font-medium text-ink">Line items</label>
         <div className="mt-3 flex flex-col gap-2">
           {items.map((item, i) => (
-            <div key={i} className="flex items-center gap-2">
+            <div
+              key={i}
+              className="flex flex-col gap-2 rounded-xl border border-border p-3 sm:flex-row sm:items-center sm:border-0 sm:p-0"
+            >
               <input
                 placeholder="Description"
                 value={item.description}
                 onChange={(e) => updateItem(i, { description: e.target.value })}
-                className={`flex-1 ${inputClass}`}
+                className={`${inputClass} sm:flex-1`}
               />
-              <input
-                type="number"
-                min={0}
-                step="1"
-                value={item.quantity}
-                onChange={(e) => updateItem(i, { quantity: Number(e.target.value) })}
-                className={`w-20 ${inputClass}`}
-                aria-label="Quantity"
-              />
-              <input
-                type="number"
-                min={0}
-                step="0.01"
-                value={item.unit_price}
-                onChange={(e) => updateItem(i, { unit_price: Number(e.target.value) })}
-                className={`w-28 ${inputClass}`}
-                aria-label="Unit price"
-              />
-              <span className="w-24 shrink-0 text-right text-sm tabular-nums text-ink-soft">
-                {new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(
-                  item.quantity * item.unit_price
-                )}
-              </span>
-              <button
-                type="button"
-                onClick={() => removeItem(i)}
-                disabled={items.length === 1}
-                className="rounded-md p-1.5 text-ink-faint transition-colors hover:bg-status-overdue-bg hover:text-status-overdue-text disabled:opacity-30"
-                aria-label="Remove line"
-              >
-                <svg viewBox="0 0 20 20" fill="none" strokeWidth="1.8" stroke="currentColor" className="h-4 w-4">
-                  <path d="M5 5l10 10M15 5 5 15" strokeLinecap="round" />
-                </svg>
-              </button>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min={0}
+                  step="1"
+                  value={item.quantity}
+                  onChange={(e) => updateItem(i, { quantity: Number(e.target.value) })}
+                  className={`w-16 sm:w-20 ${inputClass}`}
+                  aria-label="Quantity"
+                />
+                <input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={item.unit_price}
+                  onChange={(e) => updateItem(i, { unit_price: Number(e.target.value) })}
+                  className={`min-w-0 flex-1 sm:w-28 sm:flex-none ${inputClass}`}
+                  aria-label="Unit price"
+                />
+                <span className="w-20 shrink-0 text-right text-sm tabular-nums text-ink-soft sm:w-24">
+                  {new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(
+                    item.quantity * item.unit_price
+                  )}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => removeItem(i)}
+                  disabled={items.length === 1}
+                  className="shrink-0 rounded-md p-1.5 text-ink-faint transition-colors hover:bg-status-overdue-bg hover:text-status-overdue-text disabled:opacity-30"
+                  aria-label="Remove line"
+                >
+                  <svg viewBox="0 0 20 20" fill="none" strokeWidth="1.8" stroke="currentColor" className="h-4 w-4">
+                    <path d="M5 5l10 10M15 5 5 15" strokeLinecap="round" />
+                  </svg>
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -150,11 +155,15 @@ export default function NewInvoiceForm({
         />
       </div>
 
-      <div className="flex items-center justify-between rounded-3xl border border-border bg-surface shadow-sm p-5">
+      <div className="flex flex-col gap-3 rounded-3xl border border-border bg-surface shadow-sm p-5 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-lg font-semibold tabular-nums text-ink">
           Total: {new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(total)}
         </p>
-        <button type="submit" disabled={isPending || !customerId} className={buttonClasses("primary")}>
+        <button
+          type="submit"
+          disabled={isPending || !customerId}
+          className={buttonClasses("primary", "w-full justify-center sm:w-auto")}
+        >
           {isPending ? "Creating..." : "Create Invoice"}
         </button>
       </div>
