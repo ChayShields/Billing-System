@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { sendInvoiceIssued, sendPaidConfirmation } from "@/lib/email"
+import { requireAdmin } from "@/lib/auth"
 import type { Customer, Invoice, InvoiceItem } from "@/lib/types"
 
 export type NewInvoiceItem = {
@@ -18,6 +19,7 @@ export async function createInvoice(input: {
   notes: string | null
   items: NewInvoiceItem[]
 }) {
+  await requireAdmin()
   const supabase = await createClient()
 
   const total = input.items.reduce((sum, item) => sum + item.quantity * item.unit_price, 0)
@@ -55,6 +57,7 @@ export async function createInvoice(input: {
 // line items, total, and bank payment details - so they know what's
 // owed and how to pay it.
 export async function markInvoiceSent(invoiceId: string) {
+  await requireAdmin()
   const supabase = await createClient()
 
   const { data: invoice, error } = await supabase
@@ -75,6 +78,7 @@ export async function markInvoiceSent(invoiceId: string) {
 // Marks an invoice paid and emails the customer the same invoice, now
 // showing a paid confirmation instead of payment instructions.
 export async function markInvoicePaid(invoiceId: string) {
+  await requireAdmin()
   const supabase = await createClient()
 
   const { data: invoice, error } = await supabase
@@ -98,6 +102,7 @@ export async function markInvoicePaid(invoiceId: string) {
 // the standard "here's what you owe" email); doesn't apply to drafts,
 // which were never issued in the first place.
 export async function resendInvoice(invoiceId: string) {
+  await requireAdmin()
   const supabase = await createClient()
 
   const { data: invoice, error } = await supabase
@@ -122,6 +127,7 @@ export async function resendInvoice(invoiceId: string) {
 // all payments reaches the invoice's full amount; a partial payment just
 // updates the balance shown, nothing gets emailed for it.
 export async function recordPayment(invoiceId: string, formData: FormData) {
+  await requireAdmin()
   const supabase = await createClient()
 
   const amount = Number(formData.get("amount") ?? 0)
@@ -168,6 +174,7 @@ export async function recordPayment(invoiceId: string, formData: FormData) {
 // to "sent" now that the running total no longer covers the full amount -
 // silently, no email, since this is a correction not a real status change.
 export async function deletePayment(paymentId: string, invoiceId: string) {
+  await requireAdmin()
   const supabase = await createClient()
 
   const { error: deleteError } = await supabase.from("invoice_payments").delete().eq("id", paymentId)
@@ -202,6 +209,7 @@ export async function deletePayment(paymentId: string, invoiceId: string) {
 }
 
 export async function updateInvoiceStatus(invoiceId: string, status: "draft" | "overdue") {
+  await requireAdmin()
   const supabase = await createClient()
   const { error } = await supabase.from("invoices").update({ status }).eq("id", invoiceId)
   if (error) throw new Error(error.message)

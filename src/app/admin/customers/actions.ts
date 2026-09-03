@@ -5,8 +5,10 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { SITE_URL } from "@/lib/business-details"
+import { requireAdmin } from "@/lib/auth"
 
 export async function createCustomer(formData: FormData) {
+  await requireAdmin()
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -29,6 +31,7 @@ export async function createCustomer(formData: FormData) {
 }
 
 export async function updateCustomer(customerId: string, formData: FormData) {
+  await requireAdmin()
   const supabase = await createClient()
 
   const { error } = await supabase
@@ -54,6 +57,7 @@ export async function updateCustomer(customerId: string, formData: FormData) {
 // /portal. Uses the admin client (secret key) - only ever called from
 // this server action, never exposed to the browser.
 export async function createCustomerLogin(customerId: string, email: string) {
+  await requireAdmin()
   const admin = createAdminClient()
 
   const { data: created, error: createError } = await admin.auth.admin.createUser({
@@ -99,6 +103,7 @@ export async function createCustomerLogin(customerId: string, email: string) {
 // customer. The generate-recurring-invoices cron picks these up and
 // auto-creates + auto-sends an invoice 14 days before each due date.
 export async function createRecurringItem(customerId: string, formData: FormData) {
+  await requireAdmin()
   const supabase = await createClient()
 
   const { error } = await supabase.from("recurring_items").insert({
@@ -118,6 +123,7 @@ export async function createRecurringItem(customerId: string, formData: FormData
 // it generated still show what created them if that's ever worth knowing,
 // it just stops being picked up by the cron.
 export async function cancelRecurringItem(recurringItemId: string, customerId: string) {
+  await requireAdmin()
   const supabase = await createClient()
 
   const { error } = await supabase
@@ -134,6 +140,7 @@ export async function cancelRecurringItem(recurringItemId: string, customerId: s
 // used when Chay needs to reset a customer's password (forgotten,
 // suspected compromised, etc.), not just at first creation.
 export async function resetCustomerPassword(customerId: string, email: string) {
+  await requireAdmin()
   const admin = createAdminClient()
 
   const { error } = await admin.auth.resetPasswordForEmail(email, {

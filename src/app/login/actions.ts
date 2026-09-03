@@ -1,11 +1,19 @@
 "use server"
 
 import { redirect } from "next/navigation"
+import { headers } from "next/headers"
 import { createClient } from "@/lib/supabase/server"
+import { checkRateLimit } from "@/lib/rate-limit"
 
 export async function login(formData: FormData) {
   const email = String(formData.get("email") ?? "")
   const password = String(formData.get("password") ?? "")
+
+  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
+  const { allowed, retryAfterSeconds } = checkRateLimit(`login:${ip}`, 8, 5 * 60 * 1000)
+  if (!allowed) {
+    redirect(`/login?error=${encodeURIComponent(`Too many attempts. Try again in ${retryAfterSeconds}s.`)}`)
+  }
 
   const supabase = await createClient()
   const { data: signInData, error } = await supabase.auth.signInWithPassword({ email, password })

@@ -5,6 +5,8 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { buttonClasses } from "@/components/ui/Button"
+import { validatePasswordStrength } from "@/lib/password"
+import { updatePassword } from "./actions"
 
 export default function ResetPasswordPage() {
   const router = useRouter()
@@ -35,8 +37,9 @@ export default function ResetPasswordPage() {
     e.preventDefault()
     setError("")
 
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters.")
+    const strengthError = validatePasswordStrength(password)
+    if (strengthError) {
+      setError(strengthError)
       return
     }
     if (password !== confirmPassword) {
@@ -45,9 +48,9 @@ export default function ResetPasswordPage() {
     }
 
     setIsPending(true)
-    const { error: updateError } = await supabase.auth.updateUser({ password })
+    const { error: updateError } = await updatePassword(password)
     if (updateError) {
-      setError(updateError.message)
+      setError(updateError)
       setIsPending(false)
       return
     }
@@ -116,6 +119,9 @@ export default function ResetPasswordPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="mt-1.5 w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-ink shadow-xs placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
                 />
+                <p className="mt-1.5 text-xs text-ink-faint">
+                  At least 10 characters, with 3 of: uppercase, lowercase, numbers, symbols.
+                </p>
               </div>
               <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-ink">
