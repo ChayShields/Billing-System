@@ -22,6 +22,11 @@ export async function login(formData: FormData) {
     redirect(`/login?error=${encodeURIComponent(error?.message ?? "Sign in failed.")}`)
   }
 
+  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+  if (aal && aal.nextLevel === "aal2" && aal.currentLevel !== "aal2") {
+    redirect("/login/mfa")
+  }
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")

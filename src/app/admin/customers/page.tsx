@@ -1,12 +1,18 @@
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { getSessionProfile } from "@/lib/auth"
-import { createCustomer } from "./actions"
+import { createCustomer, inviteAdmin } from "./actions"
 import { buttonClasses } from "@/components/ui/Button"
 import CustomerList from "./CustomerList"
+import RemoveAdminButton from "./RemoveAdminButton"
 import type { Customer } from "@/lib/types"
 
-export default async function CustomersPage() {
+export default async function CustomersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ adminError?: string }>
+}) {
+  const { adminError } = await searchParams
   const supabase = await createClient()
   const { data: customers } = await supabase
     .from("customers")
@@ -81,6 +87,12 @@ export default async function CustomersPage() {
 
           <div className="mt-6 rounded-3xl border border-border bg-surface shadow-sm p-5">
             <h2 className="text-sm font-semibold text-ink">Team</h2>
+            {adminError === "duplicate" && (
+              <p className="mt-2 rounded-xl bg-status-overdue-bg px-3 py-2 text-xs text-status-overdue-text">
+                Couldn&apos;t invite that email - it&apos;s already registered to another account (an admin
+                or a customer).
+              </p>
+            )}
             <div className="mt-4 flex flex-col gap-3">
               {admins.map((a) => (
                 <div key={a.id} className="flex items-start gap-3">
@@ -98,9 +110,24 @@ export default async function CustomersPage() {
                       </span>
                     </div>
                   </div>
+                  {!a.isYou && admins.length > 1 && <RemoveAdminButton userId={a.id} email={a.email} />}
                 </div>
               ))}
             </div>
+
+            <form action={inviteAdmin} className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
+              <label className="text-xs font-medium text-ink-soft">Invite an admin</label>
+              <input
+                name="email"
+                type="email"
+                placeholder="Email"
+                required
+                className="rounded-xl border border-border px-3 py-2 text-sm text-ink shadow-xs placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+              />
+              <button type="submit" className={buttonClasses("secondary", "mt-1 w-full")}>
+                Send invite
+              </button>
+            </form>
           </div>
         </div>
       </div>

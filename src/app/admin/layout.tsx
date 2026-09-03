@@ -33,6 +33,16 @@ const NAV = [
       </svg>
     ),
   },
+  {
+    href: "/admin/security",
+    label: "Security",
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none" strokeWidth="1.6" stroke="currentColor">
+        <rect x="4" y="9" width="12" height="8" rx="1.5" />
+        <path d="M6.5 9V6a3.5 3.5 0 0 1 7 0v3" strokeLinecap="round" />
+      </svg>
+    ),
+  },
 ]
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

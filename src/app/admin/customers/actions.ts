@@ -152,3 +152,64 @@ export async function resetCustomerPassword(customerId: string, email: string) {
 
   revalidatePath(`/admin/customers/${customerId}`)
 }
+
+// Creates a new admin login and emails them a link to set their own
+// password - same shape as createCustomerLogin, but role: "admin" and no
+// customer_id. Scales to any number of admins; nothing here is hardcoded
+// to a single account.
+export async function inviteAdmin(formData: FormData) {
+  await requireAdmin()
+  const email = String(formData.get("email") ?? "").trim().toLowerCase()
+  const admin = createAdminClient()
+
+  const { data: created, error: createError } = await admin.auth.admin.createUser({
+    email,
+    email_confirm: true,
+    password: crypto.randomUUID(),
+  })
+  if (createError?.code === "email_exists") {
+    redirect(`/admin/customers?adminError=duplicate`)
+  }
+  if (createError) throw new Error(createError.message)
+
+  const { error: profileError } = await admin.from("profiles").insert({
+    id: created.user.id,
+    role: "admin",
+  })
+  if (profileError) throw new Error(profileError.message)
+
+  const { error: resetError } = await admin.auth.resetPasswordForEmail(email, {
+    redirectTo: `${SITE_URL}/reset-password`,
+  })
+  if (resetError) {
+    console.error(`Admin login created for ${email}, but the setup email failed to send:`, resetError.message)
+  }
+
+  revalidatePath("/admin/customers")
+}
+
+// Revokes an admin's access entirely (deletes the auth user, which cascades
+// to their profile row). Guarded against removing yourself or the last
+// remaining admin, so the account can never be locked out of its own
+// billing system.
+export async function removeAdmin(userId: string) {
+  const me = await requireAdmin()
+  if (userId === me.id) {
+    throw new Error("You can't remove your own admin access.")
+  }
+
+  const admin = createAdminClient()
+  const { count } = await admin
+    .from("profiles")
+    .select("id", { count: "exact", head: true })
+    .eq("role", "admin")
+
+  if ((count ?? 0) <= 1) {
+    throw new Error("Can't remove the last admin.")
+  }
+
+  const { error } = await admin.auth.admin.deleteUser(userId)
+  if (error) throw new Error(error.message)
+
+  revalidatePath("/admin/customers")
+}
