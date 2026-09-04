@@ -10,6 +10,7 @@ const FILTERS: { label: string; value?: InvoiceStatus }[] = [
   { label: "Sent", value: "sent" },
   { label: "Paid", value: "paid" },
   { label: "Overdue", value: "overdue" },
+  { label: "Void", value: "void" },
 ]
 
 export default async function InvoicesPage({

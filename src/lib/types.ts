@@ -1,4 +1,4 @@
-export type InvoiceStatus = "draft" | "sent" | "paid" | "overdue"
+export type InvoiceStatus = "draft" | "sent" | "paid" | "overdue" | "void"
 
 export type Customer = {
   id: string

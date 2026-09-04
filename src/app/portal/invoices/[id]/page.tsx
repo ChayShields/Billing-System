@@ -19,6 +19,7 @@ export default async function PortalInvoiceDetailPage({
     .select("*, invoice_items(*)")
     .eq("id", id)
     .eq("customer_id", profile.customer_id!)
+    .neq("status", "void")
     .single<Invoice & { invoice_items: InvoiceItem[] }>()
 
   if (!invoice) notFound()

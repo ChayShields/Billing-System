@@ -8,6 +8,8 @@ import MarkPaidButton from "./MarkPaidButton"
 import SendInvoiceButton from "./SendInvoiceButton"
 import ResendInvoiceButton from "./ResendInvoiceButton"
 import DeletePaymentButton from "./DeletePaymentButton"
+import DeleteInvoiceButton from "./DeleteInvoiceButton"
+import VoidInvoiceButton from "./VoidInvoiceButton"
 import { updateInvoiceStatus, recordPayment } from "../actions"
 
 export default async function InvoiceDetailPage({
@@ -64,7 +66,17 @@ export default async function InvoiceDetailPage({
           </Link>
         </div>
         <div className="flex items-center gap-3">
-          {invoice.status !== "draft" && <ResendInvoiceButton invoiceId={invoice.id} />}
+          {invoice.status === "draft" && (
+            <Link
+              href={`/admin/invoices/${invoice.id}/edit`}
+              className="text-sm font-medium text-accent hover:text-accent-hover"
+            >
+              Edit
+            </Link>
+          )}
+          {invoice.status !== "draft" && invoice.status !== "void" && (
+            <ResendInvoiceButton invoiceId={invoice.id} />
+          )}
           {invoice.status === "paid" && (
             <a
               href={`/api/invoices/${invoice.id}/pdf`}
@@ -74,6 +86,10 @@ export default async function InvoiceDetailPage({
             </a>
           )}
           <StatusBadge status={invoice.status} />
+          {invoice.status === "draft" && <DeleteInvoiceButton invoiceId={invoice.id} />}
+          {invoice.status !== "draft" && invoice.status !== "void" && (
+            <VoidInvoiceButton invoiceId={invoice.id} />
+          )}
         </div>
       </div>
 
@@ -150,7 +166,7 @@ export default async function InvoiceDetailPage({
         )}
       </div>
 
-      {invoice.status !== "draft" && (
+      {invoice.status !== "draft" && invoice.status !== "void" && (
         <div className="mt-4 rounded-3xl border border-border bg-surface shadow-sm p-5">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold text-ink">Payments</h2>
@@ -213,7 +229,7 @@ export default async function InvoiceDetailPage({
         </div>
       )}
 
-      {invoice.status !== "paid" && (
+      {invoice.status !== "paid" && invoice.status !== "void" && (
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <MarkPaidButton invoiceId={invoice.id} />
           {invoice.status === "draft" && <SendInvoiceButton invoiceId={invoice.id} />}

@@ -12,6 +12,7 @@ export default async function PortalPage() {
     .from("invoices")
     .select("*")
     .eq("customer_id", profile.customer_id!)
+    .neq("status", "void")
     .order("issue_date", { ascending: false })
     .returns<Invoice[]>()
 

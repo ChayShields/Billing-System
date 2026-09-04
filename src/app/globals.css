@@ -26,6 +26,9 @@
   --color-status-overdue-bg: #fef2f2;
   --color-status-overdue-text: #b91c1c;
   --color-status-overdue-dot: #ef4444;
+  --color-status-void-bg: #f4f4f5;
+  --color-status-void-text: #71717a;
+  --color-status-void-dot: #a1a1aa;
 
   /* Layered elevation: every level stacks a tight contact shadow with a
      soft, wide ambient one, rather than one flat blur. */
@@ -59,6 +62,9 @@
   --color-status-overdue-bg: var(--color-status-overdue-bg);
   --color-status-overdue-text: var(--color-status-overdue-text);
   --color-status-overdue-dot: var(--color-status-overdue-dot);
+  --color-status-void-bg: var(--color-status-void-bg);
+  --color-status-void-text: var(--color-status-void-text);
+  --color-status-void-dot: var(--color-status-void-dot);
   --shadow-xs: var(--shadow-xs);
   --shadow-sm: var(--shadow-sm);
   --shadow-md: var(--shadow-md);

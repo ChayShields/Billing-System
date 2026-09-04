@@ -20,7 +20,7 @@ export default async function AdminDashboard() {
   for (const inv of invoices ?? []) {
     if (inv.status === "paid") totals.paid += inv.total
     else if (inv.status === "overdue") totals.overdue += inv.total
-    else totals.outstanding += inv.total
+    else if (inv.status !== "void") totals.outstanding += inv.total
   }
 
   const formatGBP = (n: number) =>
