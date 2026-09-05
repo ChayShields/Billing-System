@@ -61,3 +61,12 @@ export type Profile = {
   role: "admin" | "customer"
   customer_id: string | null
 }
+
+export type ModuleName = "booking" | "ga_dashboard" | "crm" | "local_seo" | "ai_content" | "email_marketing"
+
+export type CustomerModule = {
+  id: string
+  customer_id: string
+  module: ModuleName
+  enabled_at: string
+}

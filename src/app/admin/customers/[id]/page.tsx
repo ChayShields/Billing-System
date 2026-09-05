@@ -4,9 +4,10 @@ import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { buttonClasses } from "@/components/ui/Button"
 import StatusBadge from "@/components/ui/StatusBadge"
-import type { Customer, Invoice, RecurringItem } from "@/lib/types"
+import type { Customer, Invoice, ModuleName, RecurringItem } from "@/lib/types"
 import { createCustomerLogin, resetCustomerPassword, createRecurringItem } from "../actions"
 import CancelRecurringItemButton from "./CancelRecurringItemButton"
+import ModuleToggles from "./ModuleToggles"
 
 export default async function CustomerDetailPage({
   params,
@@ -41,6 +42,12 @@ export default async function CustomerDetailPage({
     .eq("active", true)
     .order("next_due_date")
     .returns<RecurringItem[]>()
+
+  const { data: customerModules } = await supabase
+    .from("customer_modules")
+    .select("module")
+    .eq("customer_id", id)
+    .returns<{ module: ModuleName }[]>()
 
   const admin = createAdminClient()
   const { data: existingProfile } = await admin
@@ -150,6 +157,17 @@ export default async function CustomerDetailPage({
                 <dd className="whitespace-pre-line text-ink">{customer.address ?? "–"}</dd>
               </div>
             </dl>
+          </div>
+
+          <div className="rounded-3xl border border-border bg-surface shadow-sm p-5">
+            <h2 className="text-sm font-semibold text-ink">Modules</h2>
+            <p className="mt-1 text-xs text-ink-soft">
+              Which parts of the client dashboard this customer can access in their portal.
+            </p>
+            <ModuleToggles
+              customerId={customer.id}
+              enabledModules={(customerModules ?? []).map((m) => m.module)}
+            />
           </div>
 
           <div className="rounded-3xl border border-border bg-surface shadow-sm p-5">

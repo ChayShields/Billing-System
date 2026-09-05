@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { SITE_URL } from "@/lib/business-details"
 import { requireAdmin } from "@/lib/auth"
+import type { ModuleName } from "@/lib/types"
 
 export async function createCustomer(formData: FormData) {
   await requireAdmin()
@@ -212,4 +213,29 @@ export async function removeAdmin(userId: string) {
   if (error) throw new Error(error.message)
 
   revalidatePath("/admin/customers")
+}
+
+// Switches one client-dashboard module on or off for a customer. A row
+// in customer_modules means "on"; toggling off just deletes the row
+// rather than tracking a separate enabled flag, matching how
+// cancelRecurringItem-style toggles already work in this codebase.
+export async function toggleCustomerModule(customerId: string, module: ModuleName, enabled: boolean) {
+  await requireAdmin()
+  const supabase = await createClient()
+
+  if (enabled) {
+    const { error } = await supabase
+      .from("customer_modules")
+      .insert({ customer_id: customerId, module })
+    if (error) throw new Error(error.message)
+  } else {
+    const { error } = await supabase
+      .from("customer_modules")
+      .delete()
+      .eq("customer_id", customerId)
+      .eq("module", module)
+    if (error) throw new Error(error.message)
+  }
+
+  revalidatePath(`/admin/customers/${customerId}`)
 }
