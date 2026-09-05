@@ -239,3 +239,13 @@ export async function toggleCustomerModule(customerId: string, module: ModuleNam
 
   revalidatePath(`/admin/customers/${customerId}`)
 }
+
+export async function updateCustomerGA4Property(customerId: string, propertyId: string | null) {
+  await requireAdmin()
+  const supabase = await createClient()
+
+  const { error } = await supabase.from("customers").update({ ga4_property_id: propertyId }).eq("id", customerId)
+  if (error) throw new Error(error.message)
+
+  revalidatePath(`/admin/customers/${customerId}`)
+}

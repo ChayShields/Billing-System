@@ -8,6 +8,9 @@ import type { Customer, Invoice, ModuleName, RecurringItem } from "@/lib/types"
 import { createCustomerLogin, resetCustomerPassword, createRecurringItem } from "../actions"
 import CancelRecurringItemButton from "./CancelRecurringItemButton"
 import ModuleToggles from "./ModuleToggles"
+import GA4PropertyForm from "./GA4PropertyForm"
+import CustomerSidebarTabs from "./CustomerSidebarTabs"
+import { listGA4Properties } from "@/lib/google-analytics"
 
 export default async function CustomerDetailPage({
   params,
@@ -74,6 +77,170 @@ export default async function CustomerDetailPage({
   const formatGBP = (n: number) =>
     new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n)
 
+  const ga4Options = await listGA4Properties()
+
+  const detailsTab = (
+    <>
+      <div className="rounded-3xl border border-border bg-surface shadow-sm p-5">
+        <h2 className="text-sm font-semibold text-ink">Contact</h2>
+        <dl className="mt-3 space-y-3 text-sm">
+          <div>
+            <dt className="text-xs text-ink-faint">Email</dt>
+            <dd className="text-ink">{customer.email}</dd>
+          </div>
+          <div>
+            <dt className="text-xs text-ink-faint">Phone</dt>
+            <dd className="text-ink">{customer.phone ?? "–"}</dd>
+          </div>
+          <div>
+            <dt className="text-xs text-ink-faint">Website</dt>
+            <dd className="text-ink">
+              {customer.website ? (
+                <a
+                  href={customer.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent hover:text-accent-hover"
+                >
+                  {customer.website}
+                </a>
+              ) : (
+                "–"
+              )}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs text-ink-faint">Address</dt>
+            <dd className="whitespace-pre-line text-ink">{customer.address ?? "–"}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div className="rounded-3xl border border-border bg-surface shadow-sm p-5">
+        <h2 className="text-sm font-semibold text-ink">Portal access</h2>
+        {loginError === "duplicate" && (
+          <p className="mt-2 rounded-xl bg-status-overdue-bg px-3 py-2 text-xs text-status-overdue-text">
+            Couldn&apos;t create a login - {customer.email} is already registered to another account elsewhere in
+            the system. Use a different email for this customer, or check whether they already have a login under
+            this one.
+          </p>
+        )}
+        {existingProfile ? (
+          <div className="mt-2">
+            <p className="flex items-center gap-1.5 text-sm text-status-paid-text">
+              <svg viewBox="0 0 20 20" fill="none" strokeWidth="1.8" stroke="currentColor" className="h-4 w-4 shrink-0">
+                <path d="M4 10.5 8 14l8-8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Login active
+            </p>
+            <p className="mt-2 text-xs text-ink-soft">
+              Logs in with <span className="font-medium text-ink">{customer.email}</span>
+            </p>
+            <form action={resetAction} className="mt-3">
+              <p className="text-xs text-ink-faint">Sends {customer.email} a fresh link to set a new password.</p>
+              <button type="submit" className={buttonClasses("secondary", "mt-2 w-full")}>
+                Reset password
+              </button>
+            </form>
+          </div>
+        ) : (
+          <form action={inviteAction} className="mt-2">
+            <p className="text-xs text-ink-soft">Creates a login and emails {customer.email} a link to set their password.</p>
+            <button type="submit" className={buttonClasses("secondary", "mt-3 w-full")}>
+              Create portal login
+            </button>
+          </form>
+        )}
+      </div>
+    </>
+  )
+
+  const billingTab = (
+    <div className="rounded-3xl border border-border bg-surface shadow-sm p-5">
+      <h2 className="text-sm font-semibold text-ink">Recurring billing</h2>
+      <p className="mt-1 text-xs text-ink-soft">Auto-generates and sends an invoice 14 days before each renewal.</p>
+
+      {(recurringItems ?? []).length > 0 && (
+        <div className="mt-3 flex flex-col gap-2">
+          {recurringItems!.map((item) => (
+            <div
+              key={item.id}
+              className="flex items-center justify-between rounded-xl border border-border bg-surface-sunken px-3 py-2"
+            >
+              <div>
+                <p className="text-sm font-medium text-ink">{item.description}</p>
+                <p className="text-xs text-ink-faint">
+                  {formatGBP(item.amount)} / {item.interval_unit} &middot; next {item.next_due_date}
+                </p>
+              </div>
+              <CancelRecurringItemButton recurringItemId={item.id} customerId={customer.id} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      <form action={addRecurringAction} className="mt-4 flex flex-col gap-2">
+        <input
+          name="description"
+          placeholder="e.g. Web Hosting - Annual"
+          required
+          className="rounded-xl border border-border px-3 py-2 text-sm text-ink shadow-xs placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+        />
+        <div className="grid grid-cols-2 gap-2">
+          <input
+            name="amount"
+            type="number"
+            min={0}
+            step="0.01"
+            placeholder="Amount"
+            required
+            className="rounded-xl border border-border px-3 py-2 text-sm text-ink shadow-xs placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+          />
+          <select
+            name="interval_unit"
+            defaultValue="year"
+            className="rounded-xl border border-border px-3 py-2 text-sm text-ink shadow-xs focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+          >
+            <option value="year">Yearly</option>
+            <option value="month">Monthly</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs text-ink-faint">First due date</label>
+          <input
+            name="next_due_date"
+            type="date"
+            required
+            className="mt-1 w-full rounded-xl border border-border px-3 py-2 text-sm text-ink shadow-xs focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+          />
+        </div>
+        <button type="submit" className={buttonClasses("secondary", "mt-1 w-full")}>
+          Add recurring item
+        </button>
+      </form>
+    </div>
+  )
+
+  const dashboardAccessTab = (
+    <>
+      <div className="rounded-3xl border border-border bg-surface shadow-sm p-5">
+        <h2 className="text-sm font-semibold text-ink">Modules</h2>
+        <p className="mt-1 text-xs text-ink-soft">
+          Which parts of the client dashboard this customer can access in their portal.
+        </p>
+        <ModuleToggles customerId={customer.id} enabledModules={(customerModules ?? []).map((m) => m.module)} />
+      </div>
+
+      <div className="rounded-3xl border border-border bg-surface shadow-sm p-5">
+        <h2 className="text-sm font-semibold text-ink">Google Analytics</h2>
+        <p className="mt-1 text-xs text-ink-soft">
+          Which GA4 property is this customer&apos;s, needed for their Analytics module to show real data.
+        </p>
+        <GA4PropertyForm customerId={customer.id} initialValue={customer.ga4_property_id} options={ga4Options} />
+      </div>
+    </>
+  )
+
   return (
     <div>
       <Link href="/admin/customers" className="text-sm text-ink-soft hover:text-ink">
@@ -123,161 +290,7 @@ export default async function CustomerDetailPage({
           </div>
         </div>
 
-        <div className="flex flex-col gap-4">
-          <div className="rounded-3xl border border-border bg-surface shadow-sm p-5">
-            <h2 className="text-sm font-semibold text-ink">Contact</h2>
-            <dl className="mt-3 space-y-3 text-sm">
-              <div>
-                <dt className="text-xs text-ink-faint">Email</dt>
-                <dd className="text-ink">{customer.email}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-ink-faint">Phone</dt>
-                <dd className="text-ink">{customer.phone ?? "–"}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-ink-faint">Website</dt>
-                <dd className="text-ink">
-                  {customer.website ? (
-                    <a
-                      href={customer.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-accent hover:text-accent-hover"
-                    >
-                      {customer.website}
-                    </a>
-                  ) : (
-                    "–"
-                  )}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs text-ink-faint">Address</dt>
-                <dd className="whitespace-pre-line text-ink">{customer.address ?? "–"}</dd>
-              </div>
-            </dl>
-          </div>
-
-          <div className="rounded-3xl border border-border bg-surface shadow-sm p-5">
-            <h2 className="text-sm font-semibold text-ink">Modules</h2>
-            <p className="mt-1 text-xs text-ink-soft">
-              Which parts of the client dashboard this customer can access in their portal.
-            </p>
-            <ModuleToggles
-              customerId={customer.id}
-              enabledModules={(customerModules ?? []).map((m) => m.module)}
-            />
-          </div>
-
-          <div className="rounded-3xl border border-border bg-surface shadow-sm p-5">
-            <h2 className="text-sm font-semibold text-ink">Recurring billing</h2>
-            <p className="mt-1 text-xs text-ink-soft">
-              Auto-generates and sends an invoice 14 days before each renewal.
-            </p>
-
-            {(recurringItems ?? []).length > 0 && (
-              <div className="mt-3 flex flex-col gap-2">
-                {recurringItems!.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between rounded-xl border border-border bg-surface-sunken px-3 py-2"
-                  >
-                    <div>
-                      <p className="text-sm font-medium text-ink">{item.description}</p>
-                      <p className="text-xs text-ink-faint">
-                        {formatGBP(item.amount)} / {item.interval_unit} &middot; next{" "}
-                        {item.next_due_date}
-                      </p>
-                    </div>
-                    <CancelRecurringItemButton recurringItemId={item.id} customerId={customer.id} />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <form action={addRecurringAction} className="mt-4 flex flex-col gap-2">
-              <input
-                name="description"
-                placeholder="e.g. Web Hosting - Annual"
-                required
-                className="rounded-xl border border-border px-3 py-2 text-sm text-ink shadow-xs placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
-              />
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  name="amount"
-                  type="number"
-                  min={0}
-                  step="0.01"
-                  placeholder="Amount"
-                  required
-                  className="rounded-xl border border-border px-3 py-2 text-sm text-ink shadow-xs placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
-                />
-                <select
-                  name="interval_unit"
-                  defaultValue="year"
-                  className="rounded-xl border border-border px-3 py-2 text-sm text-ink shadow-xs focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
-                >
-                  <option value="year">Yearly</option>
-                  <option value="month">Monthly</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs text-ink-faint">First due date</label>
-                <input
-                  name="next_due_date"
-                  type="date"
-                  required
-                  className="mt-1 w-full rounded-xl border border-border px-3 py-2 text-sm text-ink shadow-xs focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
-                />
-              </div>
-              <button type="submit" className={buttonClasses("secondary", "mt-1 w-full")}>
-                Add recurring item
-              </button>
-            </form>
-          </div>
-
-          <div className="rounded-3xl border border-border bg-surface shadow-sm p-5">
-            <h2 className="text-sm font-semibold text-ink">Portal access</h2>
-            {loginError === "duplicate" && (
-              <p className="mt-2 rounded-xl bg-status-overdue-bg px-3 py-2 text-xs text-status-overdue-text">
-                Couldn&apos;t create a login - {customer.email} is already registered to another account
-                elsewhere in the system. Use a different email for this customer, or check whether they
-                already have a login under this one.
-              </p>
-            )}
-            {existingProfile ? (
-              <div className="mt-2">
-                <p className="flex items-center gap-1.5 text-sm text-status-paid-text">
-                  <svg viewBox="0 0 20 20" fill="none" strokeWidth="1.8" stroke="currentColor" className="h-4 w-4 shrink-0">
-                    <path d="M4 10.5 8 14l8-8" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  Login active
-                </p>
-                <p className="mt-2 text-xs text-ink-soft">
-                  Logs in with <span className="font-medium text-ink">{customer.email}</span>
-                </p>
-                <form action={resetAction} className="mt-3">
-                  <p className="text-xs text-ink-faint">
-                    Sends {customer.email} a fresh link to set a new password.
-                  </p>
-                  <button type="submit" className={buttonClasses("secondary", "mt-2 w-full")}>
-                    Reset password
-                  </button>
-                </form>
-              </div>
-            ) : (
-              <form action={inviteAction} className="mt-2">
-                <p className="text-xs text-ink-soft">
-                  Creates a login and emails {customer.email} a link to set their password.
-                </p>
-                <button type="submit" className={buttonClasses("secondary", "mt-3 w-full")}>
-                  Create portal login
-                </button>
-              </form>
-            )}
-          </div>
-        </div>
+        <CustomerSidebarTabs details={detailsTab} billing={billingTab} dashboardAccess={dashboardAccessTab} />
       </div>
     </div>
   )

@@ -1,9 +1,18 @@
 import Link from "next/link"
 import { requireCustomer } from "@/lib/auth"
+import { createClient } from "@/lib/supabase/server"
 import { logout } from "@/app/login/actions"
+import PortalNav from "@/components/PortalNav"
 
 export default async function PortalLayout({ children }: { children: React.ReactNode }) {
-  await requireCustomer()
+  const profile = await requireCustomer()
+  const supabase = await createClient()
+  const { data: modules } = await supabase
+    .from("customer_modules")
+    .select("module")
+    .eq("customer_id", profile.customer_id!)
+
+  const showAnalytics = (modules ?? []).some((m) => m.module === "ga_dashboard")
 
   return (
     <div className="min-h-screen bg-surface-sunken">
@@ -24,6 +33,7 @@ export default async function PortalLayout({ children }: { children: React.React
             </button>
           </form>
         </div>
+        <PortalNav showAnalytics={showAnalytics} />
       </header>
       <main className="mx-auto max-w-2xl px-4 py-8">{children}</main>
       <footer className="mx-auto flex max-w-2xl justify-center gap-2 px-4 pb-8 text-xs text-ink-faint">

@@ -8,6 +8,7 @@ export type Customer = {
   phone: string | null
   website: string | null
   address: string | null
+  ga4_property_id: string | null
   created_at: string
 }
 
